@@ -3,7 +3,7 @@
 `NiChord` is a Python package for visualizing functional connectivity data. 
 This package was inspired by [NeuroMArVL](https://immersive.erc.monash.edu/neuromarvl/?example=40496078-effa-4ac3-9d3e-cb7f946e7dd1_137.147.133.145),
 an online visualization tool. With just a few lines of Python code, `NiChord`
- can create figures like these two examples below:
+ can create figures like these:
   
  <p align="center">
   <img src="example\ex_1_and_2.png" />
@@ -72,11 +72,12 @@ edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
 
 ### Plotting
 
-These variables and a filepath (`fp_chord = 'ex0_good.png'`) can then be 
+These variables and a filepath can then be 
 passed to create the chord diagram:
 ```
 from nichord.chord import plot_chord
 
+fp_chord = 'ex0_good.png' # if None, chord diagram opened in matplotlib window
 plot_chord(idx_to_label, edges, edge_weights=edge_weights, 
     fp_chord=fp_chord,
     linewidths=15, alphas = 0.9, do_ROI_circles=True, 
@@ -94,7 +95,7 @@ Plotting the glass brain involves the same variables (note that the colors of
 the glass brain nodes should correspond to the same colors as the chord network 
 labels)
 ```
-from nichord.plot_glassbrain import plot_glassbrain
+from nichord.glassbrain import plot_glassbrain
 
 fp_glass = 'ex0_glassbrain.png'
 plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
@@ -135,6 +136,7 @@ edge_weights.
 ```
 from nichord.convert import convert_matrix
 
+matrix = [[0, 0.5, 0.2], [0.5, 0, -0.2], [0.2, -0.2, 0]]
 edges, edge_weights = convert_matrix(matrix)
 ```
 

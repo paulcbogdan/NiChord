@@ -36,9 +36,9 @@ class ROI_to_degree:
         return self.idx_to_degree[idx]
 
 
-def plot_chord(idx_to_label: dict, edges: list,
+def plot_chord(idx_to_label: dict, edges: Union[list, np.ndarray],
                fp_chord: Union[str, None] = None,
-               edge_weights: Union[list, None] = None,
+               edge_weights: Union[list, np.ndarray, None] = None,
                network_order: Union[list, None] = None,
                network_colors: Union[dict, None] = None,
                colors: Union[None, str, tuple, list] = None,
