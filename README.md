@@ -77,7 +77,8 @@ passed to create the chord diagram:
 ```
 from nichord.chord import plot_chord
 
-fp_chord = 'ex0_good.png' # if None, chord diagram opened in matplotlib window
+fp_chord = 'ex0_good.png' # if None, chord diagram can be opened in a matplotlib
+                          # window with matplotlib.pyplot.show()
 plot_chord(idx_to_label, edges, edge_weights=edge_weights, 
     fp_chord=fp_chord,
     linewidths=15, alphas = 0.9, do_ROI_circles=True, 

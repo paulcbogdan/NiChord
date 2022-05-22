@@ -150,10 +150,9 @@ def plot_chord(idx_to_label: dict, edges: Union[list, np.ndarray],
 
     plt.axis('off')
     plt.tight_layout()
-    if fp_chord is None:
-        plt.show()
-    else:
+    if fp_chord is not None:
         plt.savefig(fp_chord, dpi=400)
+        plt.clf()
 
 
 def plot_rim_and_labels(idx_to_label: dict, network_order: list,

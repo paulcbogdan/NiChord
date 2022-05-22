@@ -2,7 +2,7 @@ from nichord.chord import plot_chord
 from nichord.glassbrain import plot_glassbrain
 from nichord.combine import combine_imgs
 from nichord.coord_labeler import get_idx_to_label
-
+import matplotlib.pyplot as plt
 
 # Example 0 described in README.md
 if __name__ == '__main__':

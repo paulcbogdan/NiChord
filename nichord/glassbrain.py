@@ -73,7 +73,6 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
             adj[(node_idx_to_i[edge[1]], node_idx_to_i[edge[0]])] = edge_weight
         if cmap is None: cmap = plt.get_cmap('Spectral_r')
         edge_alphas = .9
-    plt.title('test')
 
     node_coords_pruned = [coords[i] for i in nonzero_node_idxs]
     node_colors = [network_colors[idx_to_label[node_i]] for node_i in
