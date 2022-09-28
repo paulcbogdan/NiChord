@@ -63,7 +63,7 @@ idx_to_label = {0: 'Visual', 1: 'DMN', 2: 'Visual', 3: 'DMN',
 ```
 
 Each edge may be associated with a weight. Weights are defined as a list of 
-length equal to the number of edges (`edge_weights = None`, then grey edges are.
+length equal to the number of edges (if `edge_weights = None`, then grey edges are.
 plotted).
 
 ```

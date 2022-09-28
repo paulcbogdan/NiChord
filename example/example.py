@@ -4,6 +4,13 @@ from nichord.combine import combine_imgs
 from nichord.coord_labeler import get_idx_to_label
 import matplotlib.pyplot as plt
 
+from nichord.chord import plot_chord
+from nichord.glassbrain import plot_glassbrain
+from nichord.combine import combine_imgs
+from nichord.coord_labeler import get_idx_to_label
+import matplotlib.pyplot as plt
+
+
 # Example 0 described in README.md
 if __name__ == '__main__':
     edges = [(0, 1), (0, 2), (1, 5), (3, 5), (4, 6), (2, 7), (6, 7)]
@@ -27,7 +34,6 @@ if __name__ == '__main__':
 
     fg_combined = r'ex0_combined.png'
     combine_imgs(fp_glass, fp_chord, fg_combined)
-
 
 # Beginning of examples 1 and 2. These examples reflect how NiChord may be used
 #   in a project involving a full connectome's worth of ROIs (here ROIs are

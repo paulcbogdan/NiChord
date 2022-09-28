@@ -14,7 +14,8 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
                     linewidths: Union[None, float, int, list] = 6,
                     alphas: Union[None, float, int, list] = None,
                     network_colors: Union[None, dict] = None,
-                    network_order: Union[list, None] = None,) -> None:
+                    network_order: Union[list, None] = None,
+                    ) -> None:
     """
     Plots the connectome on a brain, where the node colors correspond to the
         ROI's label (specified by idx_to_label). Each edge's color correspond
@@ -77,11 +78,16 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
     node_coords_pruned = [coords[i] for i in nonzero_node_idxs]
     node_colors = [network_colors[idx_to_label[node_i]] for node_i in
                    nonzero_node_idxs]
+
+    edge_vmin = min(edge_weights)
+    edge_vmax = max(edge_weights)
+
     if fp_glass is None:
         cv = plotting.view_connectome(adj, node_coords_pruned, edge_cmap=cmap,
                                       node_color=node_colors,
                                       node_size=node_size,
-                                      linewidth=linewidths, colorbar=False)
+                                      linewidth=linewidths, colorbar=False,
+                                      edge_vmax=edge_vmax, edge_vmin=edge_vmin)
         cv.open_in_browser()
     else:
         plotted_img = \
@@ -91,6 +97,7 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
                                     {'linewidth': linewidths/5,
                                      'alpha': edge_alphas if alphas is None
                                                      else alphas},
-                                    colorbar=False)
+                                    colorbar=False,
+                                    edge_vmax=edge_vmax, edge_vmin=edge_vmin)
         plotted_img.savefig(fp_glass, dpi=400)
         plotted_img.close()
