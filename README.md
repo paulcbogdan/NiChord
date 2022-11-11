@@ -151,6 +151,26 @@ malfunctioning code in `nichord.patch_RenderAgg.py`. The patch is automatically
 applied when calling `chord.plot_chord_diagram(...)` unless 
 `do_monkeypatch=False`. 
 
+## Update (November 10, 2022)
+Additions:
+* updated to allow titles for combine_image (new title= argument; '' by default)
+* updated to allow black_BG for plot_chord (new black_BG= argument; false by default, which causes a white BG). See the example below. Note: black_BG=true with the new 'turbo' default looks much better for extremely dense chord diagrams (1000+ edges)
+<p align="center">
+  <img src="example\ex1_chord_black_BG.png"  width="600" />
+</p>
+<p align="center">
+  <img src="example\outside_chord_example.png"  width="600" />
+</p>
+* updated to allow plot_chord to average all edges between a pair of networks (new plot_count= argument; default is false). Helpful when there are a lot of edges otherwise. See the example below, which is a plot_count=True version of the chord diagram immediately above. For plot_count=True, the arc color is the average of all edge weights for edges between a pair of networks. Arc thickness corresponds to the number of edges between the pair of networks
+<p align="center">
+  <img src="example\outside_chord_example_count.png"  width="600" />
+</p>
+
+Changed:
+* Default plotting color from matplotlib's 'Spectral_r' to its 'turbo'. The middle end is much more visible now and the colors overall pop more
+* Plot_chord to now plots the arcs in order of the absolute value of edge_weights or for plot_count in order of the count (thicker = on top)
+* The hinting for plot_glassbrain to specify that node_size can be a list or ndarray. Passing a list or ndarray of length = #nodes or #nonzero_nodes will cause the nodes to be plotted the different sizes specified
+
 ## Authors
 `NiChord` was created by Paul C. Bogdan with help from [Jonathan
  Shobrook](https://github.com/shobrook) as part of our research in the 

@@ -10,12 +10,12 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
                     fp_glass: Union[None, str],
                     coords: list,
                     cmap: Union[None, str, matplotlib.colors.Colormap] = None,
-                    node_size: Union[None, float, int] = 5,
+                    node_size: Union[None, float, int, list, np.ndarray] = 5,
                     linewidths: Union[None, float, int, list] = 6,
                     alphas: Union[None, float, int, list] = None,
                     network_colors: Union[None, dict] = None,
                     network_order: Union[list, None] = None,
-                    ) -> None:
+                    dpi: int = 400) -> None:
     """
     Plots the connectome on a brain, where the node colors correspond to the
         ROI's label (specified by idx_to_label). Each edge's color correspond
@@ -56,48 +56,58 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
         cmap = plt.get_cmap(cmap)
 
     if edge_weights is None:
-        edge_weights = [1]*len(edges)
+        edge_weights = [1] * len(edges)
 
     nonzero_node_idxs = list(set(node_idx for tup in edges for node_idx in tup))
     n = len(nonzero_node_idxs)
     adj = np.zeros((n, n))
-    tril_idx = np.tril_indices(n, k=-1)
     if all(weight == 1 for weight in edge_weights):
-        adj[tril_idx] = adj.T[tril_idx] = 0.5
+        node_idx_to_i = dict(
+            (node_idx, i) for i, node_idx in enumerate(nonzero_node_idxs))
+        for edge, edge_weight in zip(edges, edge_weights):
+            adj[(node_idx_to_i[edge[0]], node_idx_to_i[edge[1]])] = 1
+            adj[(node_idx_to_i[edge[1]], node_idx_to_i[edge[0]])] = 1
+
         if cmap is None: cmap = plt.get_cmap('Greys')
         edge_alphas = .4
+        edge_vmin = 0
+        edge_vmax = 1
     else:
         node_idx_to_i = dict(
             (node_idx, i) for i, node_idx in enumerate(nonzero_node_idxs))
         for edge, edge_weight in zip(edges, edge_weights):
             adj[(node_idx_to_i[edge[0]], node_idx_to_i[edge[1]])] = edge_weight
             adj[(node_idx_to_i[edge[1]], node_idx_to_i[edge[0]])] = edge_weight
-        if cmap is None: cmap = plt.get_cmap('Spectral_r')
+        if cmap is None: cmap = plt.get_cmap('turbo')
         edge_alphas = .9
+        edge_vmin = min(edge_weights)
+        edge_vmax = max(edge_weights)
 
     node_coords_pruned = [coords[i] for i in nonzero_node_idxs]
+
     node_colors = [network_colors[idx_to_label[node_i]] for node_i in
                    nonzero_node_idxs]
-
-    edge_vmin = min(edge_weights)
-    edge_vmax = max(edge_weights)
+    if isinstance(node_size, (list, np.ndarray)):
+        node_size_ = [node_size[i] for i in nonzero_node_idxs]
+    else:
+        node_size_ = node_size
 
     if fp_glass is None:
         cv = plotting.view_connectome(adj, node_coords_pruned, edge_cmap=cmap,
                                       node_color=node_colors,
-                                      node_size=node_size,
+                                      node_size=node_size_,
                                       linewidth=linewidths, colorbar=False,
                                       edge_vmax=edge_vmax, edge_vmin=edge_vmin)
         cv.open_in_browser()
     else:
         plotted_img = \
             plotting.plot_connectome(adj, node_coords_pruned,
-                                    edge_cmap=cmap, node_color=node_colors,
-                                    node_size=node_size, edge_kwargs=
-                                    {'linewidth': linewidths/5,
-                                     'alpha': edge_alphas if alphas is None
-                                                     else alphas},
-                                    colorbar=False,
-                                    edge_vmax=edge_vmax, edge_vmin=edge_vmin)
-        plotted_img.savefig(fp_glass, dpi=400)
+                                     edge_cmap=cmap, node_color=node_colors,
+                                     node_size=node_size_, edge_kwargs=
+                                     {'linewidth': linewidths / 5,
+                                      'alpha': edge_alphas if alphas is None
+                                      else alphas},
+                                     colorbar=False,
+                                     edge_vmax=edge_vmax, edge_vmin=edge_vmin)
+        plotted_img.savefig(fp_glass, dpi=dpi)
         plotted_img.close()

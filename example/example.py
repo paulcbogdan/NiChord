@@ -4,12 +4,6 @@ from nichord.combine import combine_imgs
 from nichord.coord_labeler import get_idx_to_label
 import matplotlib.pyplot as plt
 
-from nichord.chord import plot_chord
-from nichord.glassbrain import plot_glassbrain
-from nichord.combine import combine_imgs
-from nichord.coord_labeler import get_idx_to_label
-import matplotlib.pyplot as plt
-
 
 # Example 0 described in README.md
 if __name__ == '__main__':
@@ -150,6 +144,22 @@ if __name__ == '__main__':
                coords=power_coords, network_order=network_order,
                network_colors=network_colors,
                fp_chord=fp_chord, arc_setting=True)
+
+    fp_chord = r'ex1_chord_count.png'
+    plot_chord(idx_to_label, edges, edge_weights=edge_weights,
+               coords=power_coords, network_order=network_order,
+               network_colors=network_colors,
+               fp_chord=fp_chord, arc_setting=True,
+               plot_count=True)
+
+    fp_chord = r'ex1_chord_black_BG.png'
+    plot_chord(idx_to_label, edges, edge_weights=edge_weights,
+               coords=power_coords, network_order=network_order,
+               network_colors=network_colors,
+               fp_chord=fp_chord, arc_setting=True,
+               black_BG=True)
+
+    quit()
 
     fp_glass = r'ex1_glass.png'
     plot_glassbrain(idx_to_label, edges, edge_weights,  fp_glass,

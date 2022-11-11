@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from math import radians
 from typing import Union, Tuple
-
+from collections import OrderedDict
 
 class ROI_to_degree:
     """
@@ -50,7 +50,12 @@ def plot_chord(idx_to_label: dict, edges: Union[list, np.ndarray],
                do_ROI_circles: bool = False,
                do_ROI_circles_specific: bool = True,
                ROI_circle_radius: float = 0.005,
-               do_monkeypatch: bool = True) -> None:
+               black_BG: bool = False,
+               do_monkeypatch: bool = True,
+               vmin: Union[None, int, float] = None,
+               vmax: Union[None, int, float] = None,
+               plot_count: bool = False,
+               dpi: int = 400) -> None:
     """
     Plots the chord diagram and either saves a file if fp_chord is not None or
         opens it in a matplotlib window. For most of the arguments in these
@@ -105,11 +110,16 @@ def plot_chord(idx_to_label: dict, edges: Union[list, np.ndarray],
     if edge_weights is None:
         edge_weights = [1] * len(edges)
 
+    if vmin is None:
+        vmin = min(edge_weights)
+    if vmax is None:
+        vmax = max(edge_weights)
+
     if cmap is None:
-        if all(weight == 1 for weight in edge_weights):
+        if abs(vmin - vmax) < 1e-6:
             cmap = plt.get_cmap('Greys')
         else:
-            cmap = plt.get_cmap('Spectral_r')
+            cmap = plt.get_cmap('turbo')
     elif isinstance(cmap, str):
         cmap = plt.get_cmap(cmap)
 
@@ -118,12 +128,17 @@ def plot_chord(idx_to_label: dict, edges: Union[list, np.ndarray],
 
     plt.figure(figsize=(15, 15))
     radius = 0.6
-    network_low_high, network_counts, network_centers = plot_rim_and_labels(
-        idx_to_label, network_order, network_colors, radius,
-        do_monkeypatch=do_monkeypatch)
-    plot_arcs(edges, idx_to_label, network_low_high, network_counts, edge_weights,
-              network_centers, radius, cmap, coords, linewidths=linewidths,
-              seven_point_arc=arc_setting, colors=colors, alphas=alphas)
+    network_low_high, network_counts, network_centers, network_starts_ends = \
+        plot_rim_and_labels(idx_to_label, network_order, network_colors, radius,
+                            black_BG=black_BG, do_monkeypatch=do_monkeypatch)
+
+
+    vmin, vmax = plot_arcs(edges, idx_to_label, network_low_high, network_counts,
+                           edge_weights,
+              network_centers, network_starts_ends, radius, cmap, coords,
+              linewidths=linewidths,
+              seven_point_arc=arc_setting, colors=colors, alphas=alphas,
+              vmin=vmin, vmax=vmax, plot_count=plot_count)
 
     if do_ROI_circles:
         if do_ROI_circles_specific:
@@ -143,22 +158,24 @@ def plot_chord(idx_to_label: dict, edges: Union[list, np.ndarray],
             cbar = plt.colorbar(
                 mappable=matplotlib.cm.ScalarMappable(cmap=cmap,
                                           norm=matplotlib.colors.Normalize(
-                                          vmin=min(edge_weights),
-                                          vmax=max(edge_weights))),
+                                          vmin=vmin,
+                                          vmax=vmax)),
                                 fraction=0.04, pad=0.02)
             cbar.ax.tick_params(labelsize=30)
 
     plt.axis('off')
     plt.tight_layout()
     if fp_chord is not None:
-        plt.savefig(fp_chord, dpi=400)
+        plt.savefig(fp_chord, dpi=dpi)
         plt.clf()
 
 
 def plot_rim_and_labels(idx_to_label: dict, network_order: list,
                         network_colors: dict, radius: Union[float, int],
                         rim_border: Union[float, int]=1.0,
-                        do_monkeypatch: bool = True) -> Tuple[dict, dict, dict]:
+                        black_BG: bool=False,
+                        do_monkeypatch: bool = True) -> Tuple[dict, dict,
+                                                              dict, dict]:
     """
     Plots the chord diagram rims and labels. Each rim is plotted separately
 
@@ -183,6 +200,7 @@ def plot_rim_and_labels(idx_to_label: dict, network_order: list,
 
     network_low_high = {}
     network_center = {}
+    network_starts_ends = {}
     circle_consumed = 0
     for i, network in enumerate(network_order):
         cnt = network_counts[network]
@@ -197,9 +215,13 @@ def plot_rim_and_labels(idx_to_label: dict, network_order: list,
         network_low_high[network] = (
             degree_st + rim_border, degree_end - rim_border)
         network_center[network] = (circle_consumed + cnt * 0.5) / num_ROIs * 360
+        network_starts_ends[network] = (degree_st, degree_end)
         circle_consumed += cnt
-
-    return network_low_high, network_counts, network_center
+    if black_BG:
+        ax = plt.gca()
+        black_circle = plt.Circle((0, 0), radius=radius - .0225, color='k')
+        ax.add_patch(black_circle)
+    return network_low_high, network_counts, network_center, network_starts_ends
 
 
 def get_character_degree_locations(text: str, degree_st: Union[float, int],
@@ -311,8 +333,8 @@ def plot_rim_label(degree_st: Union[float, int], degree_end: Union[float, int],
                                                         font_kwargs)
 
     text = text[::-1]  # The text must be flipped so that the text reads
-    # left-to-right (note that the last character must have
-    # the lowest degree angle.
+                 # left-to-right (note that the last character must have
+                 # the lowest degree angle.
 
     for deg, char in zip(char_degrees, text):
         trans_deg = deg
@@ -351,14 +373,21 @@ def plot_rim(degree_st: Union[float, int], degree_end: Union[float, int],
 
 
 def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
-              network_counts: dict, edge_weights: list,
-              network_centers: dict, radius: float,
+              network_counts: dict,
+              edge_weights: list,
+              network_centers: dict,
+              network_starts_ends: dict,
+              radius: float,
               cmap: Union[None, str, matplotlib.colors.Colormap],
               coords: list,
               colors: Union[None, str, tuple, list],
               linewidths: Union[None, float, int, list],
               alphas: Union[None, float, int, list],
-              seven_point_arc: bool = False) -> None:
+              seven_point_arc: bool = False,
+              vmin: Union[float, int] = -1,
+              vmax: Union[float, int] = 1,
+              plot_count: bool = True,
+              plot_sum: bool = False) -> (float, float):
     """
     Plots the arcs between each ROI. Within the rim/label, ROIs are positioned
         based on their y coordinate (i.e., how anterior/posterior it is). If
@@ -388,15 +417,68 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
     roi2degree = ROI_to_degree(coords, idx_to_label, network_low_high,
                                network_counts)
     if edge_weights is None: edge_weights = np.random.random(len(edges)) * 2 - 1
-    if not all(weight == 1 for weight in edge_weights):
-        max_weight = max(edge_weights)
-        min_weight = min(edge_weights)
-    else:
-        max_weight = min_weight = 0
+    if plot_count or plot_sum:
+        network_edges = OrderedDict()
+        for (i, j), w in zip(edges, edge_weights):
+            i_network = idx_to_label[i]
+            j_network = idx_to_label[j]
+            if i_network >= j_network:
+                if (i_network, j_network) not in network_edges:
+                    network_edges[(i_network, j_network)] = []
+                network_edges[(i_network, j_network)].append(w)
+            elif j_network > i_network:
+                if (j_network, i_network) not in network_edges:
+                    network_edges[(j_network, i_network)] = []
+                network_edges[(j_network, i_network)].append(w)
+        network2thickness = {network: len(l_w)
+                             for network, l_w
+                             in network_edges.items()}
+        total_thickness = sum(network2thickness.values())
+        edge_weights = [np.mean(l_w) for l_w in network_edges.values()]
+        vmin = min(edge_weights)
+        vmax = max(edge_weights)
+        edges = list(network_edges.keys())
+        seven_point_arc = False
 
+    if plot_count:
+        edges, edge_weights = zip(*sorted(zip(edges, edge_weights),
+                                      key=lambda x: network2thickness[x[0]]))
+    else:
+        edges, edge_weights = zip(*sorted(zip(edges, edge_weights),
+                                      key=lambda x: abs(x[1])))
     for idx, (edge, edge_weight) in enumerate(zip(edges, edge_weights)):
-        deg0 = roi2degree.get_degree(edge[0])
-        deg1 = roi2degree.get_degree(edge[1])
+        if plot_count:
+            deg0 = network_centers[edge[0]]
+            deg1 = network_centers[edge[1]]
+            network_span0 = network_starts_ends[edge[0]][1] - \
+                            network_starts_ends[edge[0]][0]
+            network_span1 = network_starts_ends[edge[1]][1] - \
+                            network_starts_ends[edge[1]][0]
+
+            if edge[0] == edge[1]:
+                deg0 -= 0.15 * network_span0
+                deg1 += 0.15 * network_span1
+            else:
+                deg0_ = deg0
+                deg1_ = deg1
+                if abs(deg0 + 360 - deg1) < abs(deg0 - deg1):
+                    deg1_ -= 360
+                if abs(deg1 + 360 - deg0) < abs(deg0 - deg1):
+                    deg0_ -= 360
+
+                assert abs(deg0_ - deg1_) <= 180, f'Bad: {deg0_} | {deg1_}'
+                rel_dist = (deg0_ - deg1_) / 180
+                if rel_dist < 0:
+                    rel_dist_ = -1 - rel_dist
+                elif rel_dist > 0:
+                    rel_dist_ = 1 - rel_dist
+                rel_dist_ = np.sign(rel_dist_) * (abs(rel_dist_) ** 2)
+                deg0 -= rel_dist_ * network_span0/2
+                deg1 += rel_dist_ * network_span1/2
+
+        else:
+            deg0 = roi2degree.get_degree(edge[0])
+            deg1 = roi2degree.get_degree(edge[1])
         color = None
         linewidth = None
         alpha = None
@@ -409,11 +491,14 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
                 alpha = 0.5
         else:
             if colors is None:
-                weight_relative_min = (edge_weight - min_weight) / (
-                        max_weight - min_weight)
+                weight_relative_min = (edge_weight - vmin) / \
+                                      (vmax - vmin)
                 color = cmap(weight_relative_min)
             if linewidths is None:
-                linewidth = 1.7 + abs(edge_weight)
+                if plot_count:
+                    linewidth = network2thickness[edge] / total_thickness * 200
+                else:
+                    linewidth = 1.7 + abs(edge_weight)
             if alphas is None:
                 alpha = 0.7
 
@@ -435,12 +520,23 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
             else:
                 alpha = alphas
 
+        if abs(deg0 - deg1) < .000000000001:
+            continue     # ignores nodes' connections to itself
 
-        plot_arc(deg0, deg1, network_centers[idx_to_label[edge[0]]],
-                 network_centers[idx_to_label[edge[1]]],
+        if plot_count:
+            center0 = network_centers[edge[0]]
+            center1 = network_centers[edge[1]]
+        else:
+            center0 = network_centers[idx_to_label[edge[0]]]
+            center1 = network_centers[idx_to_label[edge[1]]]
+
+
+        plot_arc(deg0, deg1,
+                 center0, center1,
                  radius, color=color,
                  linewidth=linewidth, alpha=alpha,
                  seven_point_arc=seven_point_arc)
+    return vmin, vmax
 
 
 def plot_arc(deg0: Union[int, float], deg1: [int, float],
@@ -478,8 +574,9 @@ def plot_arc(deg0: Union[int, float], deg1: [int, float],
     theta0_ = (theta0 + np.pi) % (2 * np.pi) - np.pi
     theta1_ = (theta1 + np.pi) % (2 * np.pi) - np.pi
     dif = abs(theta0_ - theta1_)
+    # print(f'{theta0_=}, {theta1_=}')
     dif = 2 * np.pi - dif if dif > np.pi else dif
-    dif_radius = radius * ((1 - (dif / np.pi)) ** 2.5)
+    # print(f'{dif=}')
 
     start_core = [radius * (0.5 + 0.5 * (1 - (dif / np.pi)) ** 0.5),
                   (theta0 + rim_center_theta0) / 2]
@@ -499,20 +596,29 @@ def plot_arc(deg0: Union[int, float], deg1: [int, float],
         theta_mid += np.pi
 
 
-    mid_cart = polar_to_cart(dif_radius, theta_mid)
 
-    if not seven_point_arc or abs(theta0 - theta1) < np.pi / 2 or \
-            abs(theta0 - theta1 - 2 * np.pi) < np.pi / 2 or \
-            abs(theta0 - theta1 + 2 * np.pi) < np.pi / 2:
+
+    less_than_half_away = abs(theta0 - theta1) < np.pi / 2 or \
+                          abs(theta0 - theta1 - 2 * np.pi) < np.pi / 2 or \
+                          abs(theta0 - theta1 + 2 * np.pi) < np.pi / 2
+
+    # same_network = abs(rim_center_deg0 - rim_center_deg1) < .0001
+    # less_than_half_away
+    if not seven_point_arc or less_than_half_away:
+        dif_radius = (radius - .02) * ((1 - (dif / np.pi)) ** 1.35)
+        mid_cart = polar_to_cart(dif_radius, theta_mid)
         x, y = zip(start_cart, start_inner_cart, mid_cart,
                    end_inner_cart, end_cart)
-        tck, u = interpolate.splprep([list(x), list(y)], k=3, s=0.0001)
+        tck, u = interpolate.splprep([list(x), list(y)], k=3,
+                                     s=.000000000000000001) # This gives a warning
         u = np.linspace(0, 1, 1000)
         xnew, ynew = interpolate.splev(u, tck)
         xnew, ynew = zip(
             *filter(lambda xy: cart_to_polar(*xy)[0] < radius,
                     zip(xnew, ynew)))
     else:
+        dif_radius = radius * ((1 - (dif / np.pi)) ** 1.5)
+        mid_cart = polar_to_cart(dif_radius, theta_mid)
         x, y = zip(start_cart, start_inner_cart, start_network_cart, mid_cart,
                    end_network_cart, end_inner_cart, end_cart)
         tck, u = interpolate.splprep([list(x), list(y)], k=3, s=0.0001)
