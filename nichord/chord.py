@@ -393,7 +393,7 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
               plot_count: bool = True,
               plot_abs_sum: bool = False,
               normalize_thickness: bool = False,
-              max_linewidth: Union[float, int]=28,
+              max_linewidth: Union[float, int] = 28,
               sub_min_thickness: bool = False
               ) -> (float, float):
     """

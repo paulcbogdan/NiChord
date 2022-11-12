@@ -24,7 +24,6 @@ def combine_imgs(fp_glass: str, fp_chord: str, fp_combined: str,
     :param chord_mult: specifies the size of the chord diagram relative to
         the glass brain. Probably shouldn't change.
     """
-    from PIL import Image
 
     image_glass = Image.open(fp_glass)
     image_chord = Image.open(fp_chord)
@@ -73,6 +72,7 @@ def plot_and_combine(dir_out: str,
                      network_colors: Union[dict, None] = None,
                      chord_kwargs: Union[None, dict] = None,
                      glass_kwargs: Union[None, dict] = None,
+                     title: Union[None, str] = None
                      ) -> None:
     name, file_ext = os.path.splitext(fn)
     if file_ext == '':
@@ -110,4 +110,4 @@ def plot_and_combine(dir_out: str,
     plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
                     coords, **glass_kwargs)
 
-    combine_imgs(fp_glass, fp_chord, fp_combined)
+    combine_imgs(fp_glass, fp_chord, fp_combined, title=title)

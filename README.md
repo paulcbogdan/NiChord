@@ -130,7 +130,9 @@ function.
 ### Plotting everything at once
 
 You can also use `combine.plot_and_combine` to do `plot_chord`, 
-`plot_glassbrain`, and `combine_image` with a single function:
+`plot_glassbrain`, and `combine_image` with a single function. 
+`plot_and_combine` will create (if needed) and use directories `chord` and 
+`glass` wherever you specify the combined image to be made with `dir_out`.
 
 ```
     dir_out = 'example'
@@ -143,7 +145,9 @@ You can also use `combine.plot_and_combine` to do `plot_chord`,
 
 You can pass `plot_and_combine` some `chord_kwargs=` or `glass_kwargs=` to 
 adjust the appearance of the chord diagram or glass brain, like above. These two
-examples here do this and also show new features added in November 2022:
+examples here do this and also show new features added in November 2022. The
+one below shows how you can add a title and give the chord diagram a black 
+background:
 ```
     dir_out = 'example'
     fn = r'ex1_black_BG.png'
@@ -151,7 +155,7 @@ examples here do this and also show new features added in November 2022:
     plot_and_combine(dir_out, fn, idx_to_label, edges,
                      edge_weights=edge_weights, coords=power_coords,
                      network_order=network_order, network_colors=network_colors,
-                     chord_kwargs=chord_kwargs)
+                     chord_kwargs=chord_kwargs, title='Example 1b (black)')
 ```
 <p align="center">
   <img src="example\ex1_black_BG.png" />
@@ -171,7 +175,8 @@ plotted in sizes specified.
     plot_and_combine(dir_out, fn, idx_to_label, edges,
                      edge_weights=edge_weights, coords=power_coords,
                      network_order=network_order, network_colors=network_colors,
-                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs)
+                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
+                     title='Example 1c (count)')
 ```
 
 <p align="center">

@@ -2,7 +2,6 @@ from nichord.chord import plot_chord
 from nichord.glassbrain import plot_glassbrain
 from nichord.combine import combine_imgs, plot_and_combine
 from nichord.coord_labeler import get_idx_to_label
-import matplotlib.pyplot as plt
 
 
 # Example 0 described in README.md
@@ -152,7 +151,7 @@ if __name__ == '__main__':
     plot_and_combine(dir_out, fn, idx_to_label, edges,
                      edge_weights=edge_weights, coords=power_coords,
                      network_order=network_order, network_colors=network_colors,
-                     chord_kwargs=chord_kwargs)
+                     chord_kwargs=chord_kwargs, title='Example 1b (black)')
 
     fn = r'ex1_count.png'
     chord_kwargs = {'plot_count': True}
@@ -164,7 +163,8 @@ if __name__ == '__main__':
     plot_and_combine(dir_out, fn, idx_to_label, edges,
                      edge_weights=edge_weights, coords=power_coords,
                      network_order=network_order, network_colors=network_colors,
-                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs)
+                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
+                     title='Example 1c (count)')
 
 
     # example 2 ---------------------
@@ -180,4 +180,5 @@ if __name__ == '__main__':
     plot_and_combine(dir_out, fn, idx_to_label, edges,
                      edge_weights=edge_weights, coords=power_coords,
                      network_order=network_order, network_colors=network_colors,
-                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs)
+                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
+                     title='Example 2')
