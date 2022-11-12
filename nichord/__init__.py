@@ -8,7 +8,6 @@ from .chord import (ROI_to_degree,
                     plot_ROI_circles,
                     polar_to_cart,
                     cart_to_polar)
-from .combine import combine_imgs
 from .convert import convert_matrix
 from .coord_labeler import (get_idx_to_label,
                             find_closest,
@@ -17,3 +16,4 @@ from .coord_labeler import (get_idx_to_label,
 from .glassbrain import plot_glassbrain
 from .patch_RendererAgg import (NeuoChordRenderAgg,
                                 do_monkey_patch)
+from .combine import combine_imgs

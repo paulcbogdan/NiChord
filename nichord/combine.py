@@ -1,5 +1,11 @@
+import os
 from typing import Union
+
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+import matplotlib
+
+from nichord import plot_chord, plot_glassbrain
 
 
 def combine_imgs(fp_glass: str, fp_chord: str, fp_combined: str,
@@ -54,3 +60,54 @@ def add_title(title: str, im, fontsize=82):
     _, _, w, h = draw.textbbox((0, 0), title, font=font)
     draw.text(((W-w)/2, (H-h)/2), title, font=font, fill='black', align='right')
     return im_w_title
+
+
+def plot_and_combine(dir_out: str,
+                     fn: str,
+                     idx_to_label: dict,
+                     edges: Union[list, np.ndarray],
+                     edge_weights: Union[list, np.ndarray, None] = None,
+                     coords: Union[list, np.ndarray] = None,
+                     cmap: Union[None, str, matplotlib.colors.Colormap] = None,
+                     network_order: Union[list, None] = None,
+                     network_colors: Union[dict, None] = None,
+                     chord_kwargs: Union[None, dict] = None,
+                     glass_kwargs: Union[None, dict] = None,
+                     ) -> None:
+    name, file_ext = os.path.splitext(fn)
+    if file_ext == '':
+        file_ext = '.png'
+
+    dir_chord = os.path.join(dir_out, 'chord')
+    if not os.path.isdir(dir_chord): os.mkdir(dir_chord)
+    dir_glass = os.path.join(dir_out, 'glass')
+    if not os.path.isdir(dir_glass): os.mkdir(dir_glass)
+
+    fp_chord = os.path.join(dir_chord, f'{name}_chord{file_ext}')
+    fp_glass = os.path.join(dir_glass, f'{name}_glass{file_ext}')
+    fp_combined = os.path.join(dir_out, f'{name}{file_ext}')
+
+    if chord_kwargs is None: chord_kwargs = {}
+    if 'network_order' not in chord_kwargs:
+        chord_kwargs['network_order'] = network_order
+    if 'network_colors' not in chord_kwargs:
+        chord_kwargs['network_colors'] = network_colors
+    if 'cmap' not in chord_kwargs:
+        chord_kwargs['cmap'] = cmap
+
+    plot_chord(idx_to_label, edges, edge_weights=edge_weights,
+               coords=coords, fp_chord=fp_chord,
+               **chord_kwargs)
+
+    if glass_kwargs is None: glass_kwargs = {}
+    if 'network_order' not in glass_kwargs:
+        glass_kwargs['network_order'] = network_order
+    if 'network_colors' not in glass_kwargs:
+        glass_kwargs['network_colors'] = network_colors
+    if 'cmap' not in glass_kwargs:
+        glass_kwargs['cmap'] = cmap
+
+    plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
+                    coords, **glass_kwargs)
+
+    combine_imgs(fp_glass, fp_chord, fp_combined)

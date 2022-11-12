@@ -1,6 +1,6 @@
 from nichord.chord import plot_chord
 from nichord.glassbrain import plot_glassbrain
-from nichord.combine import combine_imgs
+from nichord.combine import combine_imgs, plot_and_combine
 from nichord.coord_labeler import get_idx_to_label
 import matplotlib.pyplot as plt
 
@@ -13,7 +13,7 @@ if __name__ == '__main__':
               [21, -66, 48], [54, 33, 12], [-33, 3, 3], [57, -45, 12]]
     idx_to_label = get_idx_to_label(coords, atlas='yeo')
 
-    fp_chord = r'ex0_chord.png'
+    fp_chord = r'example/chord/ex0_chord.png'
     plot_chord(idx_to_label, edges, edge_weights=edge_weights,
                coords=None, network_order=None,
                network_colors=None, linewidths=15,
@@ -22,19 +22,23 @@ if __name__ == '__main__':
                do_ROI_circles_specific=True, ROI_circle_radius=0.02,
                arc_setting=False)
 
-    fp_glass = r'ex0_glass.png'
+    fp_glass = r'example/glass/ex0_glass.png'
     plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
                     coords, linewidths=15, node_size=17)
 
-    fg_combined = r'ex0_combined.png'
-    combine_imgs(fp_glass, fp_chord, fg_combined)
+    fp_combined = r'example/ex0.png'
+    combine_imgs(fp_glass, fp_chord, fp_combined)
 
 # Beginning of examples 1 and 2. These examples reflect how NiChord may be used
-#   in a project involving a full connectome's worth of ROIs (here ROIs are
-#   taken from the Power et al. (2014) atlas). The examples also show how
+#   in a project involving a full connectome's worth of ROIs. Here ROIs are
+#   taken from the Power et al. (2014) atlas. The examples also show how
 #   network label colors can be specified by the user and the networks can be
 #   plotted in a specific order around the circle.
+# It also shows how to plot everything at once using combine.plot_and_combine
+
 if __name__ == '__main__':
+    # example 1 ---------------------
+
     network_colors = {'Uncertain': 'black', 'Visual': 'purple',
                       'SM': 'darkturquoise', 'DAN': 'green', 'VAN': 'fuchsia',
                       'Limbic': 'burlywood', 'FPCN': 'orange', 'DMN': 'red'}
@@ -136,59 +140,44 @@ if __name__ == '__main__':
 
     idx_to_label = get_idx_to_label(power_coords, atlas='yeo')
 
+    dir_out = 'example'
+    fn = 'ex1.png'
+    plot_and_combine(dir_out, fn, idx_to_label, edges,
+                     edge_weights=edge_weights, coords=power_coords,
+                     network_order=network_order, network_colors=network_colors,
+                     )
 
-    # example 1 ---------------------
+    fn = r'ex1_black_BG.png'
+    chord_kwargs = {'black_BG': True}
+    plot_and_combine(dir_out, fn, idx_to_label, edges,
+                     edge_weights=edge_weights, coords=power_coords,
+                     network_order=network_order, network_colors=network_colors,
+                     chord_kwargs=chord_kwargs)
 
-    fp_chord = r'ex1_chord.png'
-    plot_chord(idx_to_label, edges, edge_weights=edge_weights,
-               coords=power_coords, network_order=network_order,
-               network_colors=network_colors,
-               fp_chord=fp_chord, arc_setting=True)
-
-    fp_chord = r'ex1_chord_count.png'
-    plot_chord(idx_to_label, edges, edge_weights=edge_weights,
-               coords=power_coords, network_order=network_order,
-               network_colors=network_colors,
-               fp_chord=fp_chord, arc_setting=True,
-               plot_count=True)
-
-    fp_chord = r'ex1_chord_black_BG.png'
-    plot_chord(idx_to_label, edges, edge_weights=edge_weights,
-               coords=power_coords, network_order=network_order,
-               network_colors=network_colors,
-               fp_chord=fp_chord, arc_setting=True,
-               black_BG=True)
-
-    quit()
-
-    fp_glass = r'ex1_glass.png'
-    plot_glassbrain(idx_to_label, edges, edge_weights,  fp_glass,
-                    power_coords, network_colors=network_colors)
-
-    fg_combined = r'ex1_combined.png'
-    combine_imgs(fp_glass, fp_chord, fg_combined)
-
+    fn = r'ex1_count.png'
+    chord_kwargs = {'plot_count': True}
+    n_nodes = len(set([i for i, j in edges] + [j for i, j in edges]))
+    glass_kwargs = {'linewidths': 0.,
+                    'node_size': list(range(1, n_nodes+1))}
+    # linewidths = 0 for glass_kwargs causes no lines to be plotted on brain
+    # setting a list for node_sizes causes the nodes to be plotted in dif sizes
+    plot_and_combine(dir_out, fn, idx_to_label, edges,
+                     edge_weights=edge_weights, coords=power_coords,
+                     network_order=network_order, network_colors=network_colors,
+                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs)
 
 
     # example 2 ---------------------
-
+    fn = r'ex2.png'
     edges = [(32, 12), (32, 48), (33, 48), (101, 105), (105, 219), (201, 33),
              (32, 105)]
     edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
 
-    fp_chord = r'ex2_chord.png'
-    plot_chord(idx_to_label, edges, edge_weights=edge_weights,
-               coords=power_coords, network_order=network_order,
-               network_colors=network_colors, linewidths=15,
-               alphas = 0.9,
-               fp_chord=fp_chord, do_ROI_circles=True,
-               do_ROI_circles_specific=True, ROI_circle_radius=0.02,
-               arc_setting=False)
-
-    fp_glass = r'ex2_glass.png'
-    plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
-                    power_coords, linewidths=15, node_size=17,
-                    network_colors=network_colors)
-
-    fg_combined = r'ex2_combined.png'
-    combine_imgs(fp_glass, fp_chord, fg_combined)
+    chord_kwargs = {'alphas': 0.9, 'linewidths': 15, 'do_ROI_circles': True,
+                    'do_ROI_circles_specific': True, 'ROI_circle_radius': 0.02,
+                    'arc_setting': False}
+    glass_kwargs = {'linewidths': 15, 'node_size': 17}
+    plot_and_combine(dir_out, fn, idx_to_label, edges,
+                     edge_weights=edge_weights, coords=power_coords,
+                     network_order=network_order, network_colors=network_colors,
+                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs)

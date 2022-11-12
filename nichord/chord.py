@@ -1,7 +1,9 @@
 import math
+import warnings
 
 import matplotlib
 from matplotlib import patches
+from scipy import interpolate
 
 from collections import defaultdict
 import matplotlib.pyplot as plt
@@ -36,7 +38,8 @@ class ROI_to_degree:
         return self.idx_to_degree[idx]
 
 
-def plot_chord(idx_to_label: dict, edges: Union[list, np.ndarray],
+def plot_chord(idx_to_label: dict,
+               edges: Union[list, np.ndarray],
                fp_chord: Union[str, None] = None,
                edge_weights: Union[list, np.ndarray, None] = None,
                network_order: Union[list, None] = None,
@@ -45,7 +48,8 @@ def plot_chord(idx_to_label: dict, edges: Union[list, np.ndarray],
                linewidths: Union[None, float, int, list] = None,
                alphas: Union[None, float, int, list] = None,
                cmap: Union[None, str, matplotlib.colors.Colormap] = None,
-               coords: list = None, arc_setting: bool = False,
+               coords: Union[list, np.ndarray] = None,
+               arc_setting: bool = True,
                cbar: Union[None, plt.colorbar] = None,
                do_ROI_circles: bool = False,
                do_ROI_circles_specific: bool = True,
@@ -387,7 +391,11 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
               vmin: Union[float, int] = -1,
               vmax: Union[float, int] = 1,
               plot_count: bool = True,
-              plot_sum: bool = False) -> (float, float):
+              plot_abs_sum: bool = False,
+              normalize_thickness: bool = False,
+              max_linewidth: Union[float, int]=28,
+              sub_min_thickness: bool = False
+              ) -> (float, float):
     """
     Plots the arcs between each ROI. Within the rim/label, ROIs are positioned
         based on their y coordinate (i.e., how anterior/posterior it is). If
@@ -417,9 +425,12 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
     roi2degree = ROI_to_degree(coords, idx_to_label, network_low_high,
                                network_counts)
     if edge_weights is None: edge_weights = np.random.random(len(edges)) * 2 - 1
-    if plot_count or plot_sum:
+
+    if plot_count or plot_abs_sum:
         network_edges = OrderedDict()
         for (i, j), w in zip(edges, edge_weights):
+            if i == j: continue # sometimes edges connected to themselves
+                                # are added. These should be ignored
             i_network = idx_to_label[i]
             j_network = idx_to_label[j]
             if i_network >= j_network:
@@ -430,24 +441,65 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
                 if (j_network, i_network) not in network_edges:
                     network_edges[(j_network, i_network)] = []
                 network_edges[(j_network, i_network)].append(w)
-        network2thickness = {network: len(l_w)
-                             for network, l_w
-                             in network_edges.items()}
-        total_thickness = sum(network2thickness.values())
+        if plot_abs_sum:
+            network2thickness = {network: sum(np.abs(l_w))
+                                 for network, l_w
+                                 in network_edges.items()}
+        else:
+            network2thickness = {network: len(l_w)
+                                 for network, l_w
+                                 in network_edges.items()}
+        if normalize_thickness:
+            network2thickness_std = {}
+            min_std_thickness = 1e10
+            max_std_thickness = 0
+            for network_pair, thickness in network2thickness.items():
+                network_span0 = network_starts_ends[network_pair[0]][1] - \
+                                network_starts_ends[network_pair[0]][0]
+                network_span1 = network_starts_ends[network_pair[1]][1] - \
+                                network_starts_ends[network_pair[1]][0]
+                if network_pair[0] == network_pair[1]:
+                    expected_thickness = (network_span0*network_span1) / (720*360)
+                else:
+                    expected_thickness = (network_span0*network_span1) / (360*360)
+                network2thickness_std[network_pair] = \
+                    thickness / expected_thickness * 25
+                min_std_thickness = min(min_std_thickness,
+                                        network2thickness_std[network_pair])
+                max_std_thickness = max(max_std_thickness,
+                                        network2thickness_std[network_pair])
+            if True or sub_min_thickness:
+                min_std_thickness -= .1
+                network2thickness_std = {network_pair:
+                                         (thickness - min_std_thickness) /
+                                         (max_std_thickness - min_std_thickness)
+                                     for network_pair, thickness in
+                                     network2thickness_std.items()}
+            network2thickness = network2thickness_std
+
+        total_thickness = sum(network2thickness.values()) # diff. normalization
+        max_linewidth_seen = 0
+        for edge, thickness in network2thickness.items(): # ensures never too thick
+            linewidth = thickness / total_thickness * 200
+            max_linewidth_seen = max(max_linewidth_seen, linewidth)
+        if max_linewidth_seen > max_linewidth:
+            for edge, thickness in network2thickness.items():
+                network2thickness[edge] = thickness / max_linewidth_seen * \
+                                          max_linewidth
         edge_weights = [np.mean(l_w) for l_w in network_edges.values()]
         vmin = min(edge_weights)
         vmax = max(edge_weights)
         edges = list(network_edges.keys())
         seven_point_arc = False
 
-    if plot_count:
+    if plot_count or plot_abs_sum:
         edges, edge_weights = zip(*sorted(zip(edges, edge_weights),
                                       key=lambda x: network2thickness[x[0]]))
     else:
         edges, edge_weights = zip(*sorted(zip(edges, edge_weights),
                                       key=lambda x: abs(x[1])))
     for idx, (edge, edge_weight) in enumerate(zip(edges, edge_weights)):
-        if plot_count:
+        if plot_count or plot_abs_sum:
             deg0 = network_centers[edge[0]]
             deg1 = network_centers[edge[1]]
             network_span0 = network_starts_ends[edge[0]][1] - \
@@ -495,8 +547,8 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
                                       (vmax - vmin)
                 color = cmap(weight_relative_min)
             if linewidths is None:
-                if plot_count:
-                    linewidth = network2thickness[edge] / total_thickness * 200
+                if plot_count or plot_abs_sum:
+                    linewidth = network2thickness[edge] / total_thickness * 250
                 else:
                     linewidth = 1.7 + abs(edge_weight)
             if alphas is None:
@@ -523,13 +575,12 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
         if abs(deg0 - deg1) < .000000000001:
             continue     # ignores nodes' connections to itself
 
-        if plot_count:
+        if plot_count or plot_abs_sum:
             center0 = network_centers[edge[0]]
             center1 = network_centers[edge[1]]
         else:
             center0 = network_centers[idx_to_label[edge[0]]]
             center1 = network_centers[idx_to_label[edge[1]]]
-
 
         plot_arc(deg0, deg1,
                  center0, center1,
@@ -560,7 +611,6 @@ def plot_arc(deg0: Union[int, float], deg1: [int, float],
     :param seven_point_arc: Tweaking True/False changes the look of the arcs
     :param linewidth: Width of arcs
     """
-    from scipy import interpolate
 
     theta0 = radians(deg0)
     theta1 = radians(deg1)
@@ -574,9 +624,7 @@ def plot_arc(deg0: Union[int, float], deg1: [int, float],
     theta0_ = (theta0 + np.pi) % (2 * np.pi) - np.pi
     theta1_ = (theta1 + np.pi) % (2 * np.pi) - np.pi
     dif = abs(theta0_ - theta1_)
-    # print(f'{theta0_=}, {theta1_=}')
     dif = 2 * np.pi - dif if dif > np.pi else dif
-    # print(f'{dif=}')
 
     start_core = [radius * (0.5 + 0.5 * (1 - (dif / np.pi)) ** 0.5),
                   (theta0 + rim_center_theta0) / 2]
@@ -609,8 +657,10 @@ def plot_arc(deg0: Union[int, float], deg1: [int, float],
         mid_cart = polar_to_cart(dif_radius, theta_mid)
         x, y = zip(start_cart, start_inner_cart, mid_cart,
                    end_inner_cart, end_cart)
+        warnings.filterwarnings("ignore", message="divide by zero encountered in divide")
         tck, u = interpolate.splprep([list(x), list(y)], k=3,
-                                     s=.000000000000000001) # This gives a warning
+                                     s=.0002,
+                                     quiet=True)
         u = np.linspace(0, 1, 1000)
         xnew, ynew = interpolate.splev(u, tck)
         xnew, ynew = zip(
@@ -621,7 +671,8 @@ def plot_arc(deg0: Union[int, float], deg1: [int, float],
         mid_cart = polar_to_cart(dif_radius, theta_mid)
         x, y = zip(start_cart, start_inner_cart, start_network_cart, mid_cart,
                    end_network_cart, end_inner_cart, end_cart)
-        tck, u = interpolate.splprep([list(x), list(y)], k=3, s=0.0001)
+        tck, u = interpolate.splprep([list(x), list(y)], k=3, s=0.0002,
+                                     quiet=True)
         u = np.linspace(0, 1, 1000)
         xnew, ynew = interpolate.splev(u, tck)
         xnew, ynew = zip(

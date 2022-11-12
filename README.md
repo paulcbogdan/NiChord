@@ -86,7 +86,7 @@ plot_chord(idx_to_label, edges, edge_weights=edge_weights,
 ```
 
 <p align="center">
-  <img src="example\ex0_chord.png" width="600" />
+  <img src="example\chord\ex0_chord.png" width="600" />
   <br>
   If no filepath is passed, the diagram will be opened in a matplotlib window.
 </p>
@@ -104,7 +104,7 @@ plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
 ```
 
 <p align="center">
-  <img src="example\ex0_glass.png" />
+  <img src="example\glass\ex0_glass.png" />
 </p>
 
 Finally, to combine the figures above:
@@ -124,7 +124,82 @@ function.
 
 
 <p align="center">
-  <img src="example\ex0_combined.png" />
+  <img src="example\ex0.png" />
+</p>
+
+### Plotting everything at once
+
+You can also use `combine.plot_and_combine` to do `plot_chord`, 
+`plot_glassbrain`, and `combine_image` with a single function:
+
+```
+    dir_out = 'example'
+    fn = 'ex1.png'
+    plot_and_combine(dir_out, fn, idx_to_label, edges,
+                     edge_weights=edge_weights, coords=power_coords,
+                     network_order=network_order, network_colors=network_colors,
+                     )
+```
+
+You can pass `plot_and_combine` some `chord_kwargs=` or `glass_kwargs=` to 
+adjust the appearance of the chord diagram or glass brain, like above. These two
+examples here do this and also show new features added in November 2022:
+```
+    dir_out = 'example'
+    fn = r'ex1_black_BG.png'
+    chord_kwargs = {'black_BG': True}
+    plot_and_combine(dir_out, fn, idx_to_label, edges,
+                     edge_weights=edge_weights, coords=power_coords,
+                     network_order=network_order, network_colors=network_colors,
+                     chord_kwargs=chord_kwargs)
+```
+<p align="center">
+  <img src="example\ex1_black_BG.png" />
+</p>
+
+Here is another example. This one shows how setting linewidth = 0 causes no 
+lines to be plotted on the glass brain. This may be useful in combination
+with setting a node sizes as a list, which casues nodes on the glassbrain to be
+plotted in sizes specified. 
+
+```
+    fn = r'ex1_count.png'
+    chord_kwargs = {'plot_count': True}
+    n_nodes = len(set([i for i, j in edges] + [j for i, j in edges]))
+    glass_kwargs = {'linewidths': 0.,
+                    'node_size': list(range(1, n_nodes+1))}
+    plot_and_combine(dir_out, fn, idx_to_label, edges,
+                     edge_weights=edge_weights, coords=power_coords,
+                     network_order=network_order, network_colors=network_colors,
+                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs)
+```
+
+<p align="center">
+  <img src="example\ex1_count.png" />
+</p>
+
+
+Final example, which shows other features (you can plot little circles on the
+chord diagrams where the arcs start): 
+
+```
+    fn = r'ex2.png'
+    edges = [(32, 12), (32, 48), (33, 48), (101, 105), (105, 219), (201, 33),
+             (32, 105)]
+    edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
+
+    chord_kwargs = {'alphas': 0.9, 'linewidths': 15, 'do_ROI_circles': True,
+                    'do_ROI_circles_specific': True, 'ROI_circle_radius': 0.02,
+                    'arc_setting': False}
+    glass_kwargs = {'linewidths': 15, 'node_size': 17}
+    plot_and_combine(dir_out, fn, idx_to_label, edges,
+                     edge_weights=edge_weights, coords=power_coords,
+                     network_order=network_order, network_colors=network_colors,
+                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs)
+```
+
+<p align="center">
+  <img src="example\ex2.png" />
 </p>
 
 
@@ -153,23 +228,28 @@ applied when calling `chord.plot_chord_diagram(...)` unless
 
 ## Update (November 10, 2022)
 Additions:
-* updated to allow titles for combine_image (new title= argument; '' by default)
-* updated to allow black_BG for plot_chord (new black_BG= argument; false by default, which causes a white BG). See the example below. Note: black_BG=true with the new 'turbo' default looks much better for extremely dense chord diagrams (1000+ edges)
+* added `combine.plot_and_combine` to do `plot_chord`, `plot_glassbrain`, and `combine_image` with a single function. See new examples above
+* updated to allow titles for `combine_image` (new `title=` argument; `''` by default)
+* updated to allow `black_BG` for `plot_chord` (new `black_BG=` argument; `false` by default, which causes a white BG). See the example below. Note: `black_BG=true` with the new `'turbo'` default looks much better for extremely dense chord diagrams (1000+ edges)
+
 <p align="center">
   <img src="example\ex1_chord_black_BG.png"  width="600" />
 </p>
+
 <p align="center">
   <img src="example\outside_chord_example.png"  width="600" />
 </p>
-* updated to allow plot_chord to average all edges between a pair of networks (new plot_count= argument; default is false). Helpful when there are a lot of edges otherwise. See the example below, which is a plot_count=True version of the chord diagram immediately above. For plot_count=True, the arc color is the average of all edge weights for edges between a pair of networks. Arc thickness corresponds to the number of edges between the pair of networks
+
+* updated to allow `plot_chord` to average all edges between a pair of networks (new `plot_count=` argument; default is `false`). Helpful when there are a lot of edges otherwise. See the example below, which is a `plot_count=True` version of the chord diagram immediately above. For `plot_count=True`, the arc color is the average of all edge weights for edges between a pair of networks. Arc thickness corresponds to the number of edges between the pair of networks
+
 <p align="center">
   <img src="example\outside_chord_example_count.png"  width="600" />
 </p>
 
 Changed:
-* Default plotting color from matplotlib's 'Spectral_r' to its 'turbo'. The middle end is much more visible now and the colors overall pop more
-* Plot_chord to now plots the arcs in order of the absolute value of edge_weights or for plot_count in order of the count (thicker = on top)
-* The hinting for plot_glassbrain to specify that node_size can be a list or ndarray. Passing a list or ndarray of length = #nodes or #nonzero_nodes will cause the nodes to be plotted the different sizes specified
+* Default plotting colormap from matplotlib's `'Spectral_r'` to its `'turbo'`. The middle end is much more visible now and the colors overall pop more
+* `plot_chord `to now plots the arcs in order of the absolute value of edge_weights or for plot_count in order of the count (thicker edges are now on top)
+* The hinting for `plot_glassbrain` to specify that node_size can be a list or ndarray. Passing a list or ndarray of length = #nodes or #nonzero_nodes will cause the nodes to be plotted the different sizes specified
 
 ## Authors
 `NiChord` was created by Paul C. Bogdan with help from [Jonathan

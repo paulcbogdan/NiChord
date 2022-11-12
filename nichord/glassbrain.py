@@ -5,17 +5,20 @@ import matplotlib
 from typing import Union
 
 
-def plot_glassbrain(idx_to_label: dict, edges: list,
-                    edge_weights: Union[list, None],
+def plot_glassbrain(idx_to_label: dict,
+                    edges: Union[list, np.ndarray],
+                    edge_weights: Union[None, list, np.ndarray],
                     fp_glass: Union[None, str],
-                    coords: list,
+                    coords: Union[list, np.ndarray] = None,
                     cmap: Union[None, str, matplotlib.colors.Colormap] = None,
                     node_size: Union[None, float, int, list, np.ndarray] = 5,
                     linewidths: Union[None, float, int, list] = 6,
                     alphas: Union[None, float, int, list] = None,
+                    network_order: Union[None, list] = None,
                     network_colors: Union[None, dict] = None,
-                    network_order: Union[list, None] = None,
-                    dpi: int = 400) -> None:
+                    dpi: int = 400,
+                    vmin: Union[None, int, float] = None,
+                    vmax: Union[None, int, float] = None) -> None:
     """
     Plots the connectome on a brain, where the node colors correspond to the
         ROI's label (specified by idx_to_label). Each edge's color correspond
@@ -67,11 +70,10 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
         for edge, edge_weight in zip(edges, edge_weights):
             adj[(node_idx_to_i[edge[0]], node_idx_to_i[edge[1]])] = 1
             adj[(node_idx_to_i[edge[1]], node_idx_to_i[edge[0]])] = 1
-
         if cmap is None: cmap = plt.get_cmap('Greys')
+        if vmin is None: vmin = 0
+        if vmin is None: vmax = 1
         edge_alphas = .4
-        edge_vmin = 0
-        edge_vmax = 1
     else:
         node_idx_to_i = dict(
             (node_idx, i) for i, node_idx in enumerate(nonzero_node_idxs))
@@ -79,15 +81,16 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
             adj[(node_idx_to_i[edge[0]], node_idx_to_i[edge[1]])] = edge_weight
             adj[(node_idx_to_i[edge[1]], node_idx_to_i[edge[0]])] = edge_weight
         if cmap is None: cmap = plt.get_cmap('turbo')
+        if vmin is None: vmin = min(edge_weights)
+        if vmax is None: vmax = max(edge_weights)
         edge_alphas = .9
-        edge_vmin = min(edge_weights)
-        edge_vmax = max(edge_weights)
 
     node_coords_pruned = [coords[i] for i in nonzero_node_idxs]
 
     node_colors = [network_colors[idx_to_label[node_i]] for node_i in
                    nonzero_node_idxs]
-    if isinstance(node_size, (list, np.ndarray)):
+    if isinstance(node_size, (list, np.ndarray)) and \
+            (not len(node_size) == len(nonzero_node_idxs)):
         node_size_ = [node_size[i] for i in nonzero_node_idxs]
     else:
         node_size_ = node_size
@@ -96,8 +99,7 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
         cv = plotting.view_connectome(adj, node_coords_pruned, edge_cmap=cmap,
                                       node_color=node_colors,
                                       node_size=node_size_,
-                                      linewidth=linewidths, colorbar=False,
-                                      edge_vmax=edge_vmax, edge_vmin=edge_vmin)
+                                      linewidth=linewidths, colorbar=False)
         cv.open_in_browser()
     else:
         plotted_img = \
@@ -108,6 +110,6 @@ def plot_glassbrain(idx_to_label: dict, edges: list,
                                       'alpha': edge_alphas if alphas is None
                                       else alphas},
                                      colorbar=False,
-                                     edge_vmax=edge_vmax, edge_vmin=edge_vmin)
+                                     edge_vmax=vmax, edge_vmin=vmin)
         plotted_img.savefig(fp_glass, dpi=dpi)
         plotted_img.close()
