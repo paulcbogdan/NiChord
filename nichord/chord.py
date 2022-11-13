@@ -59,6 +59,7 @@ def plot_chord(idx_to_label: dict,
                vmin: Union[None, int, float] = None,
                vmax: Union[None, int, float] = None,
                plot_count: bool = False,
+               norm_thickness: bool = False,
                dpi: int = 400) -> None:
     """
     Plots the chord diagram and either saves a file if fp_chord is not None or
@@ -138,11 +139,12 @@ def plot_chord(idx_to_label: dict,
 
 
     vmin, vmax = plot_arcs(edges, idx_to_label, network_low_high, network_counts,
-                           edge_weights,
-              network_centers, network_starts_ends, radius, cmap, coords,
-              linewidths=linewidths,
-              seven_point_arc=arc_setting, colors=colors, alphas=alphas,
-              vmin=vmin, vmax=vmax, plot_count=plot_count)
+                           edge_weights, network_centers, network_starts_ends,
+                           radius, cmap, coords, linewidths=linewidths,
+                           seven_point_arc=arc_setting, colors=colors,
+                           alphas=alphas, vmin=vmin, vmax=vmax,
+                           plot_count=plot_count,
+                           norm_thickness=norm_thickness)
 
     if do_ROI_circles:
         if do_ROI_circles_specific:
@@ -392,7 +394,7 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
               vmax: Union[float, int] = 1,
               plot_count: bool = True,
               plot_abs_sum: bool = False,
-              normalize_thickness: bool = False,
+              norm_thickness: bool = False,
               max_linewidth: Union[float, int] = 28,
               sub_min_thickness: bool = False
               ) -> (float, float):
@@ -449,7 +451,7 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
             network2thickness = {network: len(l_w)
                                  for network, l_w
                                  in network_edges.items()}
-        if normalize_thickness:
+        if norm_thickness:
             network2thickness_std = {}
             min_std_thickness = 1e10
             max_std_thickness = 0

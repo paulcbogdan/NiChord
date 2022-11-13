@@ -182,3 +182,10 @@ if __name__ == '__main__':
                      network_order=network_order, network_colors=network_colors,
                      chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
                      title='Example 2')
+
+    fn = r'ex2_1glass.png'
+    plot_and_combine(dir_out, fn, idx_to_label, edges,
+                     edge_weights=edge_weights, coords=power_coords,
+                     network_order=network_order, network_colors=network_colors,
+                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
+                     title='Example 2', only1glass=True)

@@ -11,6 +11,7 @@ from nichord import plot_chord, plot_glassbrain
 def combine_imgs(fp_glass: str, fp_chord: str, fp_combined: str,
                  chord_mult: Union[float, int] = 1.05,
                  title: Union[None, str] = None,
+                 only1glass: bool = False
                  ) -> None:
     """
     Combine the glass brain connectome and chord diagram into a single picture.
@@ -34,9 +35,11 @@ def combine_imgs(fp_glass: str, fp_chord: str, fp_combined: str,
     w_chord_new = int(h_glass / h_chord * w_chord * chord_mult)
     h_chord_new = int(h_glass * chord_mult)
     image_chord = image_chord.resize((w_chord_new, h_chord_new))
-    image_glass = image_glass.crop((int(w_glass * .303), 0, w_glass,
-                                    h_glass))  # drop the rightmost (axial)
-                                        # brain. The chord diagram will go here
+    if only1glass: # drop coronal & axial
+        image_glass = image_glass.crop((int(w_glass * .303), 0,
+                                        int(w_glass * .70), h_glass))
+    else: # drop only axial
+        image_glass = image_glass.crop((int(w_glass * .303), 0, w_glass, h_glass))
 
     new_im = Image.new('RGB', (image_glass.size[0] + w_chord_new, int(
         (h_chord_new - (chord_mult - 1) / 2 * h_chord_new))),
@@ -72,7 +75,8 @@ def plot_and_combine(dir_out: str,
                      network_colors: Union[dict, None] = None,
                      chord_kwargs: Union[None, dict] = None,
                      glass_kwargs: Union[None, dict] = None,
-                     title: Union[None, str] = None
+                     title: Union[None, str] = None,
+                     only1glass: bool = False
                      ) -> None:
     name, file_ext = os.path.splitext(fn)
     if file_ext == '':
@@ -110,4 +114,5 @@ def plot_and_combine(dir_out: str,
     plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
                     coords, **glass_kwargs)
 
-    combine_imgs(fp_glass, fp_chord, fp_combined, title=title)
+    combine_imgs(fp_glass, fp_chord, fp_combined, title=title,
+                 only1glass=only1glass)
