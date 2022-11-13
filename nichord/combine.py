@@ -11,8 +11,8 @@ from nichord import plot_chord, plot_glassbrain
 def combine_imgs(fp_glass: str, fp_chord: str, fp_combined: str,
                  chord_mult: Union[float, int] = 1.05,
                  title: Union[None, str] = None,
-                 only1glass: bool = False
-                 ) -> None:
+                 only1glass: bool = False,
+                 fontsize: int = 82) -> None:
     """
     Combine the glass brain connectome and chord diagram into a single picture.
         It works by loading the images with PIL then cropping and pasting
@@ -49,7 +49,7 @@ def combine_imgs(fp_glass: str, fp_chord: str, fp_combined: str,
 
     new_fp = fp_combined
 
-    if title is not None: new_im = add_title(title, new_im)
+    if title is not None: new_im = add_title(title, new_im, fontsize=fontsize)
     new_im.save(new_fp)
 
 
@@ -76,7 +76,8 @@ def plot_and_combine(dir_out: str,
                      chord_kwargs: Union[None, dict] = None,
                      glass_kwargs: Union[None, dict] = None,
                      title: Union[None, str] = None,
-                     only1glass: bool = False
+                     only1glass: bool = False,
+                     fontsize: int = 82
                      ) -> None:
     name, file_ext = os.path.splitext(fn)
     if file_ext == '':
@@ -115,4 +116,4 @@ def plot_and_combine(dir_out: str,
                     coords, **glass_kwargs)
 
     combine_imgs(fp_glass, fp_chord, fp_combined, title=title,
-                 only1glass=only1glass)
+                 only1glass=only1glass, fontsize=fontsize)
