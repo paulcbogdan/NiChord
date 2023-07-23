@@ -204,7 +204,7 @@ chord diagrams where the arcs start):
 ```
 
 <p align="center">
-  <img src="example\ex2.png" />
+  <img src="example\ex2.png"/>
 </p>
 
 
@@ -262,3 +262,10 @@ Changed:
  [Dolcos Lab](https://dolcoslab.beckman.illinois.edu/) at the Beckman Institute
  for Advanced Science and Technology and the University of Illinois at 
  Urbana-Champaign. 
+
+Please feel free to cite this repository or the below paper, if you are using 
+`NiChord` in your work:
+
+Bogdan, P.C., Iordan, A. D., Shobrook, J., & Dolcos, F. (2023). ConnSearch: A 
+Framework for Functional Connectivity Analysis Designed for Interpretability 
+and Effectiveness at Limited Sample Sizes. *NeuroImage*, 120274.

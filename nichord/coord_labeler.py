@@ -29,8 +29,8 @@ def get_idx_to_label(coords: list, atlas: str = 'yeo',
     :return:
     """
 
-    from atlasreader.atlasreader import read_atlas_peak # import statements here
-                                                        # to speed things up
+    from nichord.peak import read_atlas_peak # import statements here
+                                             # to speed things up
     idx_to_label = {}
     if atlas.lower() == 'yeo':
         atlas = get_yeo_atlas()
@@ -66,11 +66,11 @@ def find_closest(atlas: Union[str, object], coord: tuple,
         searched before using "Uncertain."
     :return: the label and the distance from the coord to the label
     """
-    from atlasreader.atlasreader import read_atlas_peak # import statements here
-                                                        # to speed things up
+    from nichord.peak import read_atlas_peak # import statements here
+                                             # to speed things up
     from scipy.spatial import distance
 
-    region = read_atlas_peak(atlas, coord, prob_thresh=0.01)  # [0][1]
+    region = read_atlas_peak(atlas, coord, prob_thresh=0.01)
     if isinstance(region, float) and np.isnan(region):
         region = 'uncertain'
 

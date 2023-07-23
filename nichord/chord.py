@@ -59,6 +59,7 @@ def plot_chord(idx_to_label: dict,
                vmin: Union[None, int, float] = None,
                vmax: Union[None, int, float] = None,
                plot_count: bool = False,
+               plot_abs_sum: bool = False,
                norm_thickness: bool = False,
                dpi: int = 400) -> None:
     """
@@ -144,6 +145,7 @@ def plot_chord(idx_to_label: dict,
                            seven_point_arc=arc_setting, colors=colors,
                            alphas=alphas, vmin=vmin, vmax=vmax,
                            plot_count=plot_count,
+                           plot_abs_sum=plot_abs_sum,
                            norm_thickness=norm_thickness)
 
     if do_ROI_circles:

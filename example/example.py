@@ -27,6 +27,7 @@ if __name__ == '__main__':
 
     fp_combined = r'example/ex0.png'
     combine_imgs(fp_glass, fp_chord, fp_combined)
+    print('Example 0 done')
 
 # Beginning of examples 1 and 2. These examples reflect how NiChord may be used
 #   in a project involving a full connectome's worth of ROIs. Here ROIs are
@@ -165,6 +166,7 @@ if __name__ == '__main__':
                      network_order=network_order, network_colors=network_colors,
                      chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
                      title='Example 1c (count)')
+    print('Example 1 done')
 
 
     # example 2 ---------------------
@@ -189,3 +191,4 @@ if __name__ == '__main__':
                      network_order=network_order, network_colors=network_colors,
                      chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
                      title='Example 2', only1glass=True)
+    print('Example 2 done')
