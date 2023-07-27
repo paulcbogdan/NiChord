@@ -16,8 +16,16 @@ class NeuoChordRenderAgg(backend_agg.RendererAgg):
         if ismath:
             return self.draw_mathtext(gc, x, y, s, prop, angle)
 
+
         flags = backend_agg.get_hinting_flag()
-        font = self._get_agg_font(prop)
+
+        # matplotlib changed the name of one of its functions in version 3.6
+        matplotlib_v36 = callable(getattr(self, '_prepare_font', None))
+        if matplotlib_v36:
+            font = self._prepare_font(prop)
+        else:
+            font = self._get_agg_font(prop)
+
         if font is None:
             return None
         # [comment preserved from the original version of this function]
@@ -43,3 +51,7 @@ class NeuoChordRenderAgg(backend_agg.RendererAgg):
 def do_monkey_patch() -> None:
     backend_agg.RendererAgg = NeuoChordRenderAgg
 
+
+
+if __name__ == '__main__':
+    do_monkey_patch()

@@ -27,7 +27,6 @@ if __name__ == '__main__':
 
     fp_combined = r'example/ex0.png'
     combine_imgs(fp_glass, fp_chord, fp_combined)
-    print('Example 0 done')
 
 # Beginning of examples 1 and 2. These examples reflect how NiChord may be used
 #   in a project involving a full connectome's worth of ROIs. Here ROIs are
