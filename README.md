@@ -36,12 +36,13 @@ glass brain diagrams and then combining the images.
 ### Input variables
 Edges are specified as a list of tuples, (i, j), where i and j are indices
 representing the two nodes making up the edge.
-```
+
+```Python
 edges = [(0, 1), (0, 2), (1, 5), (3, 5), (4, 6), (2, 7), (6, 7)]
 ```
 
 Each node index should also correspond to a coordinate in MNI space:
-```
+```Python
 coords = [[-24, -99, -12], [51, -3, -15], [-15, -70, 30], [21, 39, 39],
           [21, -66, 48], [54, 33, 12], [-33, 3, 3], [57, -45, 12]]
 ```
@@ -50,14 +51,14 @@ These coordinates can be used to construct a dictionary, mapping each node index
 to a network label (by default, network labels are based on the 
 [Yeo et al. (2011) atlas](https://journals.physiology.org/doi/full/10.1152/jn.00338.2011)):
 
-```
+```Python
 from nichord.coord_labeler import get_idx_to_label
 idx_to_label = get_idx_to_label(coords, atlas='yeo')
 ```
 
 Or a dictionary can be defined manually:
 
-```
+```Python
 idx_to_label = {0: 'Visual', 1: 'DMN', 2: 'Visual', 3: 'DMN', 
                 4: 'DAN', 5: 'FPCN', 6: 'VAN', 7: 'VAN'}
 ```
@@ -66,7 +67,7 @@ Each edge may be associated with a weight. Weights are defined as a list of
 length equal to the number of edges (if `edge_weights = None`, then grey edges are.
 plotted).
 
-```
+```Python
 edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
 ```
 
@@ -74,7 +75,8 @@ edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
 
 These variables and a filepath can then be 
 passed to create the chord diagram:
-```
+
+```Python
 from nichord.chord import plot_chord
 
 fp_chord = 'ex0_good.png' # if None, chord diagram can be opened in a matplotlib
@@ -95,7 +97,8 @@ plot_chord(idx_to_label, edges, edge_weights=edge_weights,
 Plotting the glass brain involves the same variables (note that the colors of 
 the glass brain nodes should correspond to the same colors as the chord network 
 labels)
-```
+
+```Python
 from nichord.glassbrain import plot_glassbrain
 
 fp_glass = 'ex0_glassbrain.png'
@@ -108,7 +111,8 @@ plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
 </p>
 
 Finally, to combine the figures above:
-```
+
+```Python
 from nichord.combine import combine_imgs
 
 fp_combined = 'ex0_combined.png'
@@ -134,13 +138,13 @@ You can also use `combine.plot_and_combine` to do `plot_chord`,
 `plot_and_combine` will create (if needed) and use directories `chord` and 
 `glass` wherever you specify the combined image to be made with `dir_out`.
 
-```
-    dir_out = 'example'
-    fn = 'ex1.png'
-    plot_and_combine(dir_out, fn, idx_to_label, edges,
-                     edge_weights=edge_weights, coords=power_coords,
-                     network_order=network_order, network_colors=network_colors,
-                     )
+```Python
+dir_out = 'example'
+fn = 'ex1.png'
+plot_and_combine(dir_out, fn, idx_to_label, edges,
+                 edge_weights=edge_weights, coords=power_coords,
+                 network_order=network_order, network_colors=network_colors,
+                 )
 ```
 
 You can pass `plot_and_combine` some `chord_kwargs=` or `glass_kwargs=` to 
@@ -148,14 +152,15 @@ adjust the appearance of the chord diagram or glass brain, like above. These two
 examples here do this and also show new features added in November 2022. The
 one below shows how you can add a title and give the chord diagram a black 
 background:
-```
-    dir_out = 'example'
-    fn = r'ex1_black_BG.png'
-    chord_kwargs = {'black_BG': True}
-    plot_and_combine(dir_out, fn, idx_to_label, edges,
-                     edge_weights=edge_weights, coords=power_coords,
-                     network_order=network_order, network_colors=network_colors,
-                     chord_kwargs=chord_kwargs, title='Example 1b (black)')
+
+```Python
+dir_out = 'example'
+fn = r'ex1_black_BG.png'
+chord_kwargs = {'black_BG': True}
+plot_and_combine(dir_out, fn, idx_to_label, edges,
+                 edge_weights=edge_weights, coords=power_coords,
+                 network_order=network_order, network_colors=network_colors,
+                 chord_kwargs=chord_kwargs, title='Example 1b (black)')
 ```
 <p align="center">
   <img src="example\ex1_black_BG.png" />
@@ -166,17 +171,17 @@ lines to be plotted on the glass brain. This may be useful in combination
 with setting a node sizes as a list, which casues nodes on the glassbrain to be
 plotted in sizes specified. 
 
-```
-    fn = r'ex1_count.png'
-    chord_kwargs = {'plot_count': True}
-    n_nodes = len(set([i for i, j in edges] + [j for i, j in edges]))
-    glass_kwargs = {'linewidths': 0.,
-                    'node_size': list(range(1, n_nodes+1))}
-    plot_and_combine(dir_out, fn, idx_to_label, edges,
-                     edge_weights=edge_weights, coords=power_coords,
-                     network_order=network_order, network_colors=network_colors,
-                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
-                     title='Example 1c (count)')
+```Python
+fn = r'ex1_count.png'
+chord_kwargs = {'plot_count': True}
+n_nodes = len(set([i for i, j in edges] + [j for i, j in edges]))
+glass_kwargs = {'linewidths': 0.,
+                'node_size': list(range(1, n_nodes+1))}
+plot_and_combine(dir_out, fn, idx_to_label, edges,
+                 edge_weights=edge_weights, coords=power_coords,
+                 network_order=network_order, network_colors=network_colors,
+                 chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
+                 title='Example 1c (count)')
 ```
 
 <p align="center">
@@ -187,20 +192,20 @@ plotted in sizes specified.
 Final example, which shows other features (you can plot little circles on the
 chord diagrams where the arcs start): 
 
-```
-    fn = r'ex2.png'
-    edges = [(32, 12), (32, 48), (33, 48), (101, 105), (105, 219), (201, 33),
-             (32, 105)]
-    edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
+```Python
+fn = r'ex2.png'
+edges = [(32, 12), (32, 48), (33, 48), (101, 105), (105, 219), (201, 33),
+         (32, 105)]
+edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
 
-    chord_kwargs = {'alphas': 0.9, 'linewidths': 15, 'do_ROI_circles': True,
-                    'do_ROI_circles_specific': True, 'ROI_circle_radius': 0.02,
-                    'arc_setting': False}
-    glass_kwargs = {'linewidths': 15, 'node_size': 17}
-    plot_and_combine(dir_out, fn, idx_to_label, edges,
-                     edge_weights=edge_weights, coords=power_coords,
-                     network_order=network_order, network_colors=network_colors,
-                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs)
+chord_kwargs = {'alphas': 0.9, 'linewidths': 15, 'do_ROI_circles': True,
+                'do_ROI_circles_specific': True, 'ROI_circle_radius': 0.02,
+                'arc_setting': False}
+glass_kwargs = {'linewidths': 15, 'node_size': 17}
+plot_and_combine(dir_out, fn, idx_to_label, edges,
+                 edge_weights=edge_weights, coords=power_coords,
+                 network_order=network_order, network_colors=network_colors,
+                 chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs)
 ```
 
 <p align="center">
@@ -214,7 +219,7 @@ For convenience, the function `convert.convert_matrix(matrix)` is provided, whic
 takes a matrix as input and returns two lists corresponding to edges and 
 edge_weights.
 
-```
+```Python
 from nichord.convert import convert_matrix
 
 matrix = [[0, 0.5, 0.2], [0.5, 0, -0.2], [0.2, -0.2, 0]]
