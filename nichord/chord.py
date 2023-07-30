@@ -55,6 +55,7 @@ def plot_chord(idx_to_label: dict,
                do_ROI_circles_specific: bool = True,
                ROI_circle_radius: float = 0.005,
                black_BG: bool = False,
+               label_fontsize: int = 60,
                do_monkeypatch: bool = True,
                vmin: Union[None, int, float] = None,
                vmax: Union[None, int, float] = None,
@@ -136,7 +137,8 @@ def plot_chord(idx_to_label: dict,
     radius = 0.6
     network_low_high, network_counts, network_centers, network_starts_ends = \
         plot_rim_and_labels(idx_to_label, network_order, network_colors, radius,
-                            black_BG=black_BG, do_monkeypatch=do_monkeypatch)
+                            black_BG=black_BG, label_fontsize=label_fontsize,
+                            do_monkeypatch=do_monkeypatch)
 
 
     vmin, vmax = plot_arcs(edges, idx_to_label, network_low_high, network_counts,
@@ -180,8 +182,9 @@ def plot_chord(idx_to_label: dict,
 
 def plot_rim_and_labels(idx_to_label: dict, network_order: list,
                         network_colors: dict, radius: Union[float, int],
-                        rim_border: Union[float, int]=1.0,
-                        black_BG: bool=False,
+                        rim_border: Union[float, int] = 1.0,
+                        black_BG: bool = False,
+                        label_fontsize: int = 60,
                         do_monkeypatch: bool = True) -> Tuple[dict, dict,
                                                               dict, dict]:
     """
@@ -219,6 +222,7 @@ def plot_rim_and_labels(idx_to_label: dict, network_order: list,
         plot_rim_label(degree_st, degree_end, network, rim_border=rim_border,
                        radius=radius,
                        color=network_colors[network],
+                       label_fontsize=label_fontsize,
                        do_monkeypatch=do_monkeypatch)
         network_low_high[network] = (
             degree_st + rim_border, degree_end - rim_border)
@@ -271,15 +275,23 @@ def get_character_degree_locations(text: str, degree_st: Union[float, int],
             ax.transData.inverted())
 
         width = bb0.width / 2 + bb1.width / 2
+        width *= 1.1
         boost = 1
         if 'fontname' in font_kwargs and \
                 font_kwargs['fontname'].lower() == 'monospace':
-            if char1 in ['D',
-                         'P']:  # given the shapes of these letters, they look
-                                # a bit better when pushed to be closer
-                boost -= .4     # to the previous/following letter in the text.
-            if char0 in ['A']:
+            # Given the shapes of some letters, they look a bit better when
+            # pushed to be closer to the previous/following letter in the text.
+            if char1 in ['D', 'P', 'C']:
                 boost -= .4
+            elif char0 in ['A']:
+                boost -= .8
+            elif char1 in ['A']:
+                boost += .4
+            # Somebody who understands kerning please help me.
+            # I've invested substantial effort into trying to get this right,
+            # and this is the best that I've got. It works fine for the Yeo
+            # atlas labels and for a few other label sets I tested, but
+            # there could be label sets out there where it doesn't look good.
 
         char_deg += width / arc_len * (degree_end - degree_st) + boost
         if char_deg > degree_end - degree_st - rim_border * 2:
@@ -309,7 +321,7 @@ def plot_rim_label(degree_st: Union[float, int], degree_end: Union[float, int],
                    text: str,
                    rim_border: Union[float, int] = 1, radius: float = 0.55,
                    color: Union[str, tuple] = 'black',
-                   fontsize: Union[float, int] = 40,
+                   label_fontsize: Union[float, int] = 60,
                    do_monkeypatch: bool = True):
     """
     Adds the label for its corresponding rim.
@@ -321,7 +333,7 @@ def plot_rim_label(degree_st: Union[float, int], degree_end: Union[float, int],
                        (i.e., the amount of white spacing between rims)
     :param radius: radius of the chord diagram
     :param color: label color
-    :param fontsize: label fontsize
+    :param label_fontsize: label fontsize
     :param do_monkeypatch: I think there is a bug in matplotlib, which prevents
         characters from being rotated properly. patch_RendererAgg.py contains
         code that attempts to fix this. Setting do_monkeypatch == True applies
@@ -331,11 +343,12 @@ def plot_rim_label(degree_st: Union[float, int], degree_end: Union[float, int],
     if do_monkeypatch:
         from nichord import patch_RendererAgg
         patch_RendererAgg.do_monkey_patch()
+
     # monospace is the easiest font to work with
     # although future work can try playing around with
     # the code to get non-monospace fonts working
     # (non-monospace is difficult to position).
-    font_kwargs = {'fontname': 'monospace', 'fontsize': fontsize}
+    font_kwargs = {'fontname': 'monospace', 'fontsize': label_fontsize}
     char_degrees, text = get_character_degree_locations(text, degree_st,
                                                         degree_end, rim_border,
                                                         font_kwargs)
@@ -343,7 +356,7 @@ def plot_rim_label(degree_st: Union[float, int], degree_end: Union[float, int],
     text = text[::-1]  # The text must be flipped so that the text reads
                  # left-to-right (note that the last character must have
                  # the lowest degree angle.
-
+    # spacing_incrament
     for deg, char in zip(char_degrees, text):
         trans_deg = deg
         trans_deg270 = deg + 270

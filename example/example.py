@@ -3,8 +3,9 @@ from nichord.glassbrain import plot_glassbrain
 from nichord.combine import combine_imgs, plot_and_combine
 from nichord.coord_labeler import get_idx_to_label
 
+# Each of the examples covered in the README.md file.
 
-# Example 0 described in README.md
+# Example 0, basic introduction
 if __name__ == '__main__':
     edges = [(0, 1), (0, 2), (1, 5), (3, 5), (4, 6), (2, 7), (6, 7)]
     edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
@@ -16,7 +17,7 @@ if __name__ == '__main__':
     plot_chord(idx_to_label, edges, edge_weights=edge_weights,
                coords=None, network_order=None,
                network_colors=None, linewidths=15,
-               alphas = 0.9,
+               alphas = 0.9, label_fontsize=70,
                fp_chord=fp_chord, do_ROI_circles=True,
                do_ROI_circles_specific=True, ROI_circle_radius=0.02,
                arc_setting=False)
@@ -27,13 +28,12 @@ if __name__ == '__main__':
 
     fp_combined = r'example/ex0.png'
     combine_imgs(fp_glass, fp_chord, fp_combined)
+    print('Example 0 done')
 
-# Beginning of examples 1 and 2. These examples reflect how NiChord may be used
-#   in a project involving a full connectome's worth of ROIs. Here ROIs are
-#   taken from the Power et al. (2014) atlas. The examples also show how
-#   network label colors can be specified by the user and the networks can be
-#   plotted in a specific order around the circle.
-# It also shows how to plot everything at once using combine.plot_and_combine
+# Examples 1 and 2 reflect how NiChord may be used given full connectome's
+#   worth of ROIs. Here ROIs are taken from the Power et al. (2014) atlas.
+#   The examples also show how network label colors can be specified and the
+#   networks can be plotted in a specific order around the circle.
 
 if __name__ == '__main__':
     # example 1 ---------------------
@@ -139,6 +139,7 @@ if __name__ == '__main__':
 
     idx_to_label = get_idx_to_label(power_coords, atlas='yeo')
 
+
     dir_out = 'example'
     fn = 'ex1.png'
     plot_and_combine(dir_out, fn, idx_to_label, edges,
@@ -167,7 +168,6 @@ if __name__ == '__main__':
                      title='Example 1c (count)')
     print('Example 1 done')
 
-
     # example 2 ---------------------
     fn = r'ex2.png'
     edges = [(32, 12), (32, 48), (33, 48), (101, 105), (105, 219), (201, 33),
@@ -182,12 +182,6 @@ if __name__ == '__main__':
                      edge_weights=edge_weights, coords=power_coords,
                      network_order=network_order, network_colors=network_colors,
                      chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
-                     title='Example 2')
-
-    fn = r'ex2_1glass.png'
-    plot_and_combine(dir_out, fn, idx_to_label, edges,
-                     edge_weights=edge_weights, coords=power_coords,
-                     network_order=network_order, network_colors=network_colors,
-                     chord_kwargs=chord_kwargs, glass_kwargs=glass_kwargs,
                      title='Example 2', only1glass=True)
+
     print('Example 2 done')

@@ -2,24 +2,12 @@
 
 `NiChord` is a Python package for visualizing functional connectivity data. 
 This package was inspired by [NeuroMArVL](https://immersive.erc.monash.edu/neuromarvl/?example=40496078-effa-4ac3-9d3e-cb7f946e7dd1_137.147.133.145),
-an online visualization tool. With just a few lines of Python code, `NiChord`
- can create figures like these:
-  
- <p align="center">
-  <img src="example\ex_1_and_2.png" />
+an online visualization tool. Although the code was designed for neuroscience
+research, it can be used with any configuration of edge and label data.
+
+<p align="center">
+  <img src="example\outside_chord_example.png"  width="600" />
 </p>
-
-The code can function with any configuration of edges and labels specified by
-the user. 
-
-The glass brain diagrams (left & middle) rely on the plotting tools from 
-[nilearn](https://nilearn.github.io/modules/generated/nilearn.plotting.plot_connectome.html), 
-whereas the chord diagram (right) is made from scratch by drawing shapes in 
-[matplotlib](https://matplotlib.org/). Most of the code, here, is dedicated to 
-the chord diagrams. 
-  
- This package additionally provides code to help assign labels to nodes based
- on their anatomical location. 
 
 ## Installation
 `NiChord` (requires Python 3.5+) can be installed via pip:
@@ -28,14 +16,14 @@ the chord diagrams.
 $ pip install nichord
 ```
 
-## Usage example
+## Examples
 
-The examples above were constructed by saving separate images for the chord and
-glass brain diagrams and then combining the images.
+Here, we cover the code provided in `example.example.py`. 
 
 ### Input variables
 Edges are specified as a list of tuples, (i, j), where i and j are indices
-representing the two nodes making up the edge.
+representing the two nodes making up the edge. For this example, the list 
+represents seven edges among eight nodes.
 
 ```Python
 edges = [(0, 1), (0, 2), (1, 5), (3, 5), (4, 6), (2, 7), (6, 7)]
@@ -48,24 +36,26 @@ coords = [[-24, -99, -12], [51, -3, -15], [-15, -70, 30], [21, 39, 39],
 ```
 
 These coordinates can be used to construct a dictionary, mapping each node index
-to a network label (by default, network labels are based on the 
-[Yeo et al. (2011) atlas](https://journals.physiology.org/doi/full/10.1152/jn.00338.2011)):
+to a network label. This package provides functions to help assign labels to 
+nodes given their anatomical location. By default, network labels are based on the 
+[Yeo et al. (2011) atlas](https://journals.physiology.org/doi/full/10.1152/jn.00338.2011):
 
 ```Python
 from nichord.coord_labeler import get_idx_to_label
 idx_to_label = get_idx_to_label(coords, atlas='yeo')
 ```
 
-Or a dictionary can be defined manually:
+`idx_to_label` can alternatively be defined manually:
 
 ```Python
 idx_to_label = {0: 'Visual', 1: 'DMN', 2: 'Visual', 3: 'DMN', 
                 4: 'DAN', 5: 'FPCN', 6: 'VAN', 7: 'VAN'}
 ```
 
-Each edge may be associated with a weight. Weights are defined as a list of 
-length equal to the number of edges (if `edge_weights = None`, then grey edges are.
-plotted).
+You may assign each edge a weight. Weights are defined as a list of 
+length equal to the number of edges (e.g., 8 weights for this example). 
+If `edge_weights = None`, then grey edges are plotted, unless an aggregation
+feature is used (see `plot_count=True` below).
 
 ```Python
 edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
@@ -73,18 +63,18 @@ edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
 
 ### Plotting
 
-These variables and a filepath can then be 
-passed to create the chord diagram:
+These variables and an optional filepath can then be passed to create a chord diagram:
 
 ```Python
 from nichord.chord import plot_chord
 
-fp_chord = 'ex0_good.png' # if None, chord diagram can be opened in a matplotlib
-                          # window with matplotlib.pyplot.show()
-plot_chord(idx_to_label, edges, edge_weights=edge_weights, 
-    fp_chord=fp_chord,
-    linewidths=15, alphas = 0.9, do_ROI_circles=True, 
-    do_ROI_circles_specific=True, ROI_circle_radius=0.02)
+# If the filepath is left None, the chord diagram can be opened in a matplotlib with plt.show()
+fp_chord = 'ex0_chord.png'
+plot_chord(idx_to_label, edges, edge_weights=edge_weights, fp_chord=fp_chord, 
+           linewidths=15, alphas=0.9, do_ROI_circles=True, label_fontsize=70, 
+           # July 2023 update allows changing label fontsize
+           do_ROI_circles_specific=True, ROI_circle_radius=0.02)
+
 ```
 
 <p align="center">
@@ -94,9 +84,8 @@ plot_chord(idx_to_label, edges, edge_weights=edge_weights,
 </p>
 
 
-Plotting the glass brain involves the same variables (note that the colors of 
-the glass brain nodes should correspond to the same colors as the chord network 
-labels)
+Plotting the glass brain involves the same variables. Note that the colors of 
+the glass brain nodes correspond to the network colors in the chord diagram.
 
 ```Python
 from nichord.glassbrain import plot_glassbrain
@@ -110,7 +99,7 @@ plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
   <img src="example\glass\ex0_glass.png" />
 </p>
 
-Finally, to combine the figures above:
+You can combine the figures above into a single figure.
 
 ```Python
 from nichord.combine import combine_imgs
@@ -147,10 +136,9 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
                  )
 ```
 
-You can pass `plot_and_combine` some `chord_kwargs=` or `glass_kwargs=` to 
-adjust the appearance of the chord diagram or glass brain, like above. These two
-examples here do this and also show new features added in November 2022. The
-one below shows how you can add a title and give the chord diagram a black 
+To `plot_and_combine`, you can pass `chord_kwargs` and/or `glass_kwargs` to 
+adjust the appearance of the chord diagram or glass brain, like above. The
+example below also shows how you can add a title and give the chord diagram a black 
 background:
 
 ```Python
@@ -166,7 +154,7 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
   <img src="example\ex1_black_BG.png" />
 </p>
 
-Here is another example. This one shows how setting linewidth = 0 causes no 
+Here is another example. This one shows how setting `linewidth = 0` causes no 
 lines to be plotted on the glass brain. This may be useful in combination
 with setting a node sizes as a list, which casues nodes on the glassbrain to be
 plotted in sizes specified. 
@@ -189,8 +177,11 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
 </p>
 
 
-Final example, which shows other features (you can plot little circles on the
-chord diagrams where the arcs start): 
+This example shows other features. With `do_ROI_cicles=True`, you can plot 
+little circles on the chord diagrams where the arcs start with.
+With `only1glass=True`, you can the sagittal glass brain only. These arguments
+are not specific to `plot_and_combine`. They can also be passed to 
+`plot_chord` and `plot_glassbrain`, respectively.
 
 ```Python
 fn = r'ex2.png'
@@ -226,40 +217,21 @@ matrix = [[0, 0.5, 0.2], [0.5, 0, -0.2], [0.2, -0.2, 0]]
 edges, edge_weights = convert_matrix(matrix)
 ```
 
-### Note
+
+## Note
 There is seemingly a bug in matplotlib.backend_agg.RenderAgg, which makes 
 rotated text not look ideal when plotting character by character, as is being
 done here. I submitted a [bug report](https://github.com/matplotlib/matplotlib/issues/23021)
 to matplotlib, along with a potential
 solution. It has not been accepted yet, so for now I am "monkey patching" the
 malfunctioning code in `nichord.patch_RenderAgg.py`. The patch is automatically 
-applied when calling `chord.plot_chord_diagram(...)` unless 
-`do_monkeypatch=False`. 
+applied when calling `chord.plot_chord_diagram(...)` with the default argument 
+`do_monkeypatch=True`. 
 
-## Update (November 10, 2022)
-Additions:
-* added `combine.plot_and_combine` to do `plot_chord`, `plot_glassbrain`, and `combine_image` with a single function. See new examples above
-* updated to allow titles for `combine_image` (new `title=` argument; `''` by default)
-* updated to allow `black_BG` for `plot_chord` (new `black_BG=` argument; `false` by default, which causes a white BG). See the example below. Note: `black_BG=true` with the new `'turbo'` default looks much better for extremely dense chord diagrams (1000+ edges)
-
-<p align="center">
-  <img src="example\ex1_chord_black_BG.png"  width="600" />
-</p>
-
-<p align="center">
-  <img src="example\outside_chord_example.png"  width="600" />
-</p>
-
-* updated to allow `plot_chord` to average all edges between a pair of networks (new `plot_count=` argument; default is `false`). Helpful when there are a lot of edges otherwise. See the example below, which is a `plot_count=True` version of the chord diagram immediately above. For `plot_count=True`, the arc color is the average of all edge weights for edges between a pair of networks. Arc thickness corresponds to the number of edges between the pair of networks
-
-<p align="center">
-  <img src="example\outside_chord_example_count.png"  width="600" />
-</p>
-
-Changed:
-* Default plotting colormap from matplotlib's `'Spectral_r'` to its `'turbo'`. The middle end is much more visible now and the colors overall pop more
-* `plot_chord `to now plots the arcs in order of the absolute value of edge_weights or for plot_count in order of the count (thicker edges are now on top)
-* The hinting for `plot_glassbrain` to specify that node_size can be a list or ndarray. Passing a list or ndarray of length = #nodes or #nonzero_nodes will cause the nodes to be plotted the different sizes specified
+The glass brain diagrams rely on the plotting tools from 
+[`nilearn`](https://nilearn.github.io/modules/generated/nilearn.plotting.plot_connectome.html), 
+whereas the chord diagrams is made from scratch by drawing shapes in 
+[`matplotlib`](https://matplotlib.org/).
 
 ## Authors
 `NiChord` was created by Paul C. Bogdan with help from [Jonathan
