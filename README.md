@@ -1,3 +1,6 @@
+![PyPI](https://img.shields.io/pypi/v/nichord) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nichord?link=https%3A%2F%2Fpypi.org%2Fproject%2Fnichord%2F)
+
+
 # NiChord
 
 `NiChord` is a Python package for visualizing functional connectivity data. This package was inspired by [NeuroMArVL](https://immersive.erc.monash.edu/neuromarvl/?example=40496078-effa-4ac3-9d3e-cb7f946e7dd1_137.147.133.145), an online visualization tool. Although the code was designed for neuroscience research, it can be used with any configuration of edge and label data.

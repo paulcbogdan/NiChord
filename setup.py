@@ -4,24 +4,23 @@ try:
 except ImportError:
     from distutils.core import setup
 
-if sys.version_info[:3] < (3, 5, 0):
-    print("Requires Python 3.5 to run.")
+if sys.version_info[:3] < (3, 7, 0):
+    print("Requires Python 3.7 to run.")
     sys.exit(1)
 
-desc = '`NiChord` is a Python package for visualizing functional connectivity data. This package was inspired by [NeuroMArVL](https://immersive.erc.monash.edu/neuromarvl/?example=40496078-effa-4ac3-9d3e-cb7f946e7dd1_137.147.133.145), an online visualization tool.\n\n' + \
-'The code can function with any configuration of edges and labels specified by the user.\n\n' + \
-'The glass brain diagrams (left & middle) rely on the plotting tools from [nilearn](https://nilearn.github.io/modules/generated/nilearn.plotting.plot_connectome.html), whereas the chord diagram (right) is made from scratch by drawing shapes in [matplotlib](https://matplotlib.org/). Most of the code, here, is dedicated to the chord diagrams.\n\n' + \
-'This package additionally provides code to help assign labels to nodes based on their anatomical location.\n\n' + \
-'To find out more about the package and see an example, see its [GitHub repo](https://github.com/paulcbogdan/NiChord).'
+desc = '`NiChord` is a Python package for visualizing functional connectivity data. To find out more about the ' \
+       'package and see a package, take a look at its [GitHub repo](https://github.com/paulcbogdan/NiChord)'
+
+'To find out more about the package and see an example, see its .'
 
 setup(
     name="nichord",
     description="Creates chord diagrams for connectivity/graph data",
     long_description=desc,
     long_description_content_type="text/markdown",
-    version="v0.2.0",
+    version="v0.2.2",
     packages=["nichord"],
-    python_requires=">=3.5",
+    python_requires=">=3.7",
     url="https://github.com/paulcbogdan/NiChord",
     author="paulcbogdan",
     author_email="paulcbogdan@gmail.com",
@@ -33,5 +32,13 @@ setup(
                       "pillow",
                       "atlasreader"],
     keywords=["plotting", "fmri", "plotting", "chord"],
+    classifiers=[
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+    ],
     license="MIT"
 )
