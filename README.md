@@ -1,9 +1,6 @@
 # NiChord
 
-`NiChord` is a Python package for visualizing functional connectivity data. 
-This package was inspired by [NeuroMArVL](https://immersive.erc.monash.edu/neuromarvl/?example=40496078-effa-4ac3-9d3e-cb7f946e7dd1_137.147.133.145),
-an online visualization tool. Although the code was designed for neuroscience
-research, it can be used with any configuration of edge and label data.
+`NiChord` is a Python package for visualizing functional connectivity data. This package was inspired by [NeuroMArVL](https://immersive.erc.monash.edu/neuromarvl/?example=40496078-effa-4ac3-9d3e-cb7f946e7dd1_137.147.133.145), an online visualization tool. Although the code was designed for neuroscience research, it can be used with any configuration of edge and label data.
 
 <p align="center">
   <img src="example\outside_chord_example.png"  width="600" />
@@ -21,9 +18,7 @@ $ pip install nichord
 Here, we cover the code provided in `example.example.py`. 
 
 ### Input variables
-Edges are specified as a list of tuples, (i, j), where i and j are indices
-representing the two nodes making up the edge. For this example, the list 
-represents seven edges among eight nodes.
+Edges are specified as a list of tuples, (i, j), where i and j are indices representing the two nodes making up the edge. For this example, the list represents seven edges among eight nodes.
 
 ```Python
 edges = [(0, 1), (0, 2), (1, 5), (3, 5), (4, 6), (2, 7), (6, 7)]
@@ -35,10 +30,7 @@ coords = [[-24, -99, -12], [51, -3, -15], [-15, -70, 30], [21, 39, 39],
           [21, -66, 48], [54, 33, 12], [-33, 3, 3], [57, -45, 12]]
 ```
 
-These coordinates can be used to construct a dictionary, mapping each node index
-to a network label. This package provides functions to help assign labels to 
-nodes given their anatomical location. By default, network labels are based on the 
-[Yeo et al. (2011) atlas](https://journals.physiology.org/doi/full/10.1152/jn.00338.2011):
+These coordinates can be used to construct a dictionary, mapping each node index to a network label. This package provides functions to help assign labels to nodes given their anatomical location. By default, network labels are based on the [Yeo et al. (2011) atlas](https://journals.physiology.org/doi/full/10.1152/jn.00338.2011):
 
 ```Python
 from nichord.coord_labeler import get_idx_to_label
@@ -52,10 +44,7 @@ idx_to_label = {0: 'Visual', 1: 'DMN', 2: 'Visual', 3: 'DMN',
                 4: 'DAN', 5: 'FPCN', 6: 'VAN', 7: 'VAN'}
 ```
 
-You may assign each edge a weight. Weights are defined as a list of 
-length equal to the number of edges (e.g., 8 weights for this example). 
-If `edge_weights = None`, then grey edges are plotted, unless an aggregation
-feature is used (see `plot_count=True` below).
+You may assign each edge a weight. Weights are defined as a list of length equal to the number of edges (e.g., 8 weights for this example). If `edge_weights = None`, then grey edges are plotted, unless an aggregation feature is used (see `plot_count=True` below).
 
 ```Python
 edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
@@ -78,14 +67,13 @@ plot_chord(idx_to_label, edges, edge_weights=edge_weights, fp_chord=fp_chord,
 ```
 
 <p align="center">
-  <img src="example\chord\ex0_chord.png" width="600" />
+  <img src="example\chord\ex0_chord.png" width="400" >
   <br>
   If no filepath is passed, the diagram will be opened in a matplotlib window.
 </p>
 
 
-Plotting the glass brain involves the same variables. Note that the colors of 
-the glass brain nodes correspond to the network colors in the chord diagram.
+Plotting the glass brain involves the same variables. Note that the colors of the glass brain nodes correspond to the network colors in the chord diagram.
 
 ```Python
 from nichord.glassbrain import plot_glassbrain
@@ -96,7 +84,7 @@ plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
 ```
 
 <p align="center">
-  <img src="example\glass\ex0_glass.png" />
+  <img src="example\glass\ex0_glass.png" width="760"/>
 </p>
 
 You can combine the figures above into a single figure.
@@ -108,24 +96,17 @@ fp_combined = 'ex0_combined.png'
 combine_imgs(fp_glass, fp_chord, fp_combined)
 ```
 
-Notably, these functions have many other optional variables (e.g., passing
-specific colors for each network label using a dictionary). Further information
-on these can be seen by examining `example\example.py`, which contains code used
-to generate the two examples from the first section of this README. 
-You can also learn about these by reading the hinting/documentation within each 
+Notably, these functions have many other optional variables (e.g., passing specific colors for each network label using a dictionary). Further information on these can be seen by examining `example\example.py`, which contains code used to generate the two examples from the first section of this README. You can also learn about these by reading the hinting/documentation within each 
 function.
 
 
 <p align="center">
-  <img src="example\ex0.png" />
+  <img src="example\ex0.png" width="800"/>
 </p>
 
 ### Plotting everything at once
 
-You can also use `combine.plot_and_combine` to do `plot_chord`, 
-`plot_glassbrain`, and `combine_image` with a single function. 
-`plot_and_combine` will create (if needed) and use directories `chord` and 
-`glass` wherever you specify the combined image to be made with `dir_out`.
+You can also use `combine.plot_and_combine` to do `plot_chord`, `plot_glassbrain`, and `combine_image` with a single function. `plot_and_combine` will create (if needed) and use directories `chord` and `glass` wherever you specify the combined image to be made with `dir_out`.
 
 ```Python
 dir_out = 'example'
@@ -136,10 +117,7 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
                  )
 ```
 
-To `plot_and_combine`, you can pass `chord_kwargs` and/or `glass_kwargs` to 
-adjust the appearance of the chord diagram or glass brain, like above. The
-example below also shows how you can add a title and give the chord diagram a black 
-background:
+To `plot_and_combine`, you can pass `chord_kwargs` and/or `glass_kwargs` to adjust the appearance of the chord diagram or glass brain, like above. The example below also shows how you can add a title and give the chord diagram a black background:
 
 ```Python
 dir_out = 'example'
@@ -151,13 +129,10 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
                  chord_kwargs=chord_kwargs, title='Example 1b (black)')
 ```
 <p align="center">
-  <img src="example\ex1_black_BG.png" />
+  <img src="example\ex1_black_BG.png" width="800"/>
 </p>
 
-Here is another example. This one shows how setting `linewidth = 0` causes no 
-lines to be plotted on the glass brain. This may be useful in combination
-with setting a node sizes as a list, which casues nodes on the glassbrain to be
-plotted in sizes specified. 
+Here is another example. This one shows how setting `linewidth = 0` causes no lines to be plotted on the glass brain. This may be useful in combination with setting a node sizes as a list, which casues nodes on the glassbrain to be plotted in sizes specified. 
 
 ```Python
 fn = r'ex1_count.png'
@@ -173,15 +148,11 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
 ```
 
 <p align="center">
-  <img src="example\ex1_count.png" />
+  <img src="example\ex1_count.png" width="800"/>
 </p>
 
 
-This example shows other features. With `do_ROI_cicles=True`, you can plot 
-little circles on the chord diagrams where the arcs start with.
-With `only1glass=True`, you can the sagittal glass brain only. These arguments
-are not specific to `plot_and_combine`. They can also be passed to 
-`plot_chord` and `plot_glassbrain`, respectively.
+This example shows other features. With `do_ROI_cicles=True`, you can plot little circles on the chord diagrams where the arcs start with. With `only1glass=True`, you can the sagittal glass brain only. These arguments are not specific to `plot_and_combine`. They can also be passed to `plot_chord` and `plot_glassbrain`, respectively.
 
 ```Python
 fn = r'ex2.png'
@@ -200,15 +171,13 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
 ```
 
 <p align="center">
-  <img src="example\ex2.png"/>
+  <img src="example\ex2.png"width="570"/>
 </p>
 
 
 ### Convenience functions
 
-For convenience, the function `convert.convert_matrix(matrix)` is provided, which
-takes a matrix as input and returns two lists corresponding to edges and 
-edge_weights.
+For convenience, the function `convert.convert_matrix(matrix)` is provided, which takes a matrix as input and returns two lists corresponding to edges and edge_weights.
 
 ```Python
 from nichord.convert import convert_matrix
@@ -219,30 +188,17 @@ edges, edge_weights = convert_matrix(matrix)
 
 
 ## Note
-There is seemingly a bug in matplotlib.backend_agg.RenderAgg, which makes 
-rotated text not look ideal when plotting character by character, as is being
-done here. I submitted a [bug report](https://github.com/matplotlib/matplotlib/issues/23021)
-to matplotlib, along with a potential
+There is seemingly a bug in matplotlib.backend_agg.RenderAgg, which makes rotated text not look ideal when plotting character by character. I submitted a [bug report](https://github.com/matplotlib/matplotlib/issues/23021) to matplotlib, along with a potential
 solution. It has not been accepted yet, so for now I am "monkey patching" the
 malfunctioning code in `nichord.patch_RenderAgg.py`. The patch is automatically 
 applied when calling `chord.plot_chord_diagram(...)` with the default argument 
 `do_monkeypatch=True`. 
 
-The glass brain diagrams rely on the plotting tools from 
-[`nilearn`](https://nilearn.github.io/modules/generated/nilearn.plotting.plot_connectome.html), 
-whereas the chord diagrams is made from scratch by drawing shapes in 
-[`matplotlib`](https://matplotlib.org/).
+The glass brain diagrams rely on the plotting tools from [`nilearn`](https://nilearn.github.io/modules/generated/nilearn.plotting.plot_connectome.html), whereas the chord diagrams is made from scratch by drawing shapes in [`matplotlib`](https://matplotlib.org/).
 
 ## Authors
-`NiChord` was created by Paul C. Bogdan with help from [Jonathan
- Shobrook](https://github.com/shobrook) as part of our research in the 
- [Dolcos Lab](https://dolcoslab.beckman.illinois.edu/) at the Beckman Institute
- for Advanced Science and Technology and the University of Illinois at 
- Urbana-Champaign. 
+`NiChord` was created by Paul C. Bogdan with help from [Jonathan Shobrook](https://github.com/shobrook) as part of our research in the [Dolcos Lab](https://dolcoslab.beckman.illinois.edu/) at the Beckman Institute for Advanced Science and Technology and the University of Illinois at  Urbana-Champaign. 
 
-Please feel free to cite this repository or the below paper, if you are using 
-`NiChord` in your work:
+If you are using `NiChord` in your work, we ask that you please cite below paper or the present reporsitory:
 
-Bogdan, P.C., Iordan, A. D., Shobrook, J., & Dolcos, F. (2023). ConnSearch: A 
-Framework for Functional Connectivity Analysis Designed for Interpretability 
-and Effectiveness at Limited Sample Sizes. *NeuroImage*, 120274.
+Bogdan, P.C., Iordan, A. D., Shobrook, J., & Dolcos, F. (2023). ConnSearch: A Framework for Functional Connectivity Analysis Designed for Interpretability and Effectiveness at Limited Sample Sizes. *NeuroImage*, 120274.
