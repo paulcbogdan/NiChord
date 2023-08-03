@@ -1,7 +1,9 @@
-import numpy as np
-
 from typing import Union, Tuple
 
+import numpy as np
+from scipy.spatial import distance
+
+from nichord.peak import _read_atlas_peak
 
 def get_idx_to_label(coords: list, atlas: str = 'yeo',
                      search_closest: bool = True,
@@ -9,7 +11,7 @@ def get_idx_to_label(coords: list, atlas: str = 'yeo',
                      must_have=None) -> dict:
     """
     Gets a dictionary where each ROI (idx) in the list of coords is mapped to a
-        label. By default, the this is mapping to a Yeo network parcellations.
+        label. By default, this is mapping to a Yeo network parcellations.
         If the coordinate does not correspond to any parcellation, the string
         "Uncertain" will be used.
 
@@ -29,24 +31,22 @@ def get_idx_to_label(coords: list, atlas: str = 'yeo',
     :return:
     """
 
-    from atlasreader.atlasreader import read_atlas_peak # import statements here
-                                                        # to speed things up
     idx_to_label = {}
     if atlas.lower() == 'yeo':
         atlas = get_yeo_atlas()
 
     for idx, (x, y, z) in enumerate(coords):
         if search_closest:
-            region, dist = find_closest(atlas, (x, y, z), max_dist=max_dist,
+            region, dist = find_closest(atlas, [x, y, z], max_dist=max_dist,
                                         must_have=must_have)
         else:
-            region = read_atlas_peak(atlas, (x, y, z), prob_thresh=0.1)
+            region = _read_atlas_peak(atlas, [x, y, z])
         region = region.replace('uncertain', 'Uncertain')
         idx_to_label[idx] = region
     return idx_to_label
 
 
-def find_closest(atlas: Union[str, object], coord: tuple,
+def find_closest(atlas: Union[str, object], coord: Union[tuple, list],
                  must_have: Union[list, None] = None,
                  max_dist: Union[int, float] = 5) -> Tuple[str, float]:
     """
@@ -66,11 +66,8 @@ def find_closest(atlas: Union[str, object], coord: tuple,
         searched before using "Uncertain."
     :return: the label and the distance from the coord to the label
     """
-    from atlasreader.atlasreader import read_atlas_peak # import statements here
-                                                        # to speed things up
-    from scipy.spatial import distance
 
-    region = read_atlas_peak(atlas, coord, prob_thresh=0.01)
+    region = _read_atlas_peak(atlas, coord)
     if isinstance(region, float) and np.isnan(region):
         region = 'uncertain'
 
@@ -88,12 +85,13 @@ def find_closest(atlas: Union[str, object], coord: tuple,
     for x_move in spread_dist:
         for y_move in spread_dist:
             for z_move in spread_dist:
-                coord_new = (
-                coord[0] + x_move, coord[1] + y_move, coord[2] + z_move)
+                coord_new = [coord[0] + x_move,
+                             coord[1] + y_move,
+                             coord[2] + z_move]
                 dist = distance.euclidean(coord, coord_new)
                 if dist > min_dist:
                     continue
-                region = read_atlas_peak(atlas, coord_new, prob_thresh=0.1)
+                region = _read_atlas_peak(atlas, coord_new)
                 if isinstance(region, float) and np.isnan(region):
                     region = 'uncertain'
                 if not any(key in region for key in bad_keys) and (

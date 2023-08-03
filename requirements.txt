@@ -4,4 +4,3 @@ nilearn
 matplotlib
 scipy
 pillow
-atlasreader
