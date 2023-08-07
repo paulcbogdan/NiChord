@@ -22,22 +22,22 @@ $ pip install nichord
 
 ## Examples
 
-Here, we cover the code provided in `example.example.py`. 
+Here, we cover the code provided in `example\example.py`. 
 
 ### Input variables
-Edges are specified as a list of tuples, (i, j), where i and j are indices representing the two nodes making up the edge. For this example, the list represents seven edges among eight nodes.
+`edges` are specified as a list of tuples, `(i, j)`, where `i` and `j` are indices representing the two nodes making up the edge. For this example, the following list represents seven edges among eight nodes.
 
 ```Python
 edges = [(0, 1), (0, 2), (1, 5), (3, 5), (4, 6), (2, 7), (6, 7)]
 ```
 
-Each node index should also correspond to a coordinate in MNI space:
+Each node index should also correspond to a coordinate in MNI space. The coordinates are defined as a list of lists or list of tuples, wherein the outer list's length (8, here) corresponds to the number of nodes. 
 ```Python
 coords = [[-24, -99, -12], [51, -3, -15], [-15, -70, 30], [21, 39, 39],
           [21, -66, 48], [54, 33, 12], [-33, 3, 3], [57, -45, 12]]
 ```
 
-These coordinates can be used to construct a dictionary, mapping each node index to a network label. This package provides functions to help assign labels to nodes given their anatomical location. By default, network labels are based on the [Yeo et al. (2011) atlas](https://journals.physiology.org/doi/full/10.1152/jn.00338.2011):
+These coordinates can be used to construct a dictionary (`idx_to_label`), mapping each node index to a network label. This package provides functions to help assign labels to nodes given their anatomical location, based on the [Yeo et al. (2011) atlas](https://journals.physiology.org/doi/full/10.1152/jn.00338.2011):
 
 ```Python
 from nichord.coord_labeler import get_idx_to_label
@@ -51,7 +51,7 @@ idx_to_label = {0: 'Visual', 1: 'DMN', 2: 'Visual', 3: 'DMN',
                 4: 'DAN', 5: 'FPCN', 6: 'VAN', 7: 'VAN'}
 ```
 
-You may assign each edge a weight. Weights are defined as a list of length equal to the number of edges (e.g., 8 weights for this example). If `edge_weights = None`, then grey edges are plotted, unless an aggregation feature is used (see `plot_count=True` below).
+You may assign each edge a weight. Weights are defined as a list of length equal to the number of edges (e.g., 7 weights for this example). If `edge_weights = None`, then grey edges are plotted, unless an aggregation feature is used (see `plot_count=True` below).
 
 ```Python
 edge_weights = [-0.3, -0.5, 0.7, 0.5, -0.2, 0.3, 0.8]
@@ -124,7 +124,7 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
                  )
 ```
 
-To `plot_and_combine`, you can pass `chord_kwargs` and/or `glass_kwargs` to adjust the appearance of the chord diagram or glass brain, like above. The example below also shows how you can add a title and give the chord diagram a black background:
+To `plot_and_combine`, you can pass `chord_kwargs` and/or `glass_kwargs` to adjust the appearance of the chord diagram or glass brain, which will in turn be sent to  `plot_chord` and/or `plot_glassbrain`. The example below shows this and also how you can add a title and give the chord diagram a black background:
 
 ```Python
 dir_out = 'example'
@@ -139,7 +139,7 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
   <img src="example\ex1_black_BG.png" width="800"/>
 </p>
 
-Here is another example. This one shows how setting `linewidth = 0` causes no lines to be plotted on the glass brain. This may be useful in combination with setting a node sizes as a list, which casues nodes on the glassbrain to be plotted in sizes specified. 
+Here is another example. This one shows how setting `linewidth = 0` in the glass brain kwargs causes only the glass brain ROIs to be plotted. This may be useful in combination with setting a `node_size` as a list, which causes nodes on the glass brain to be plotted in sizes specified. 
 
 ```Python
 fn = r'ex1_count.png'
@@ -159,7 +159,7 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
 </p>
 
 
-This example shows other features. With `do_ROI_cicles=True`, you can plot little circles on the chord diagrams where the arcs start with. With `only1glass=True`, you can the sagittal glass brain only. These arguments are not specific to `plot_and_combine`. They can also be passed to `plot_chord` and `plot_glassbrain`, respectively.
+This next example shows further features. With `do_ROI_cicles=True`, you can plot little circles on the chord diagrams where the arcs start with. With `only1glass=True`, you can the sagittal glass brain only. These arguments are not specific to `plot_and_combine`. They can also be passed to `plot_chord` and `plot_glassbrain`, respectively.
 
 ```Python
 fn = r'ex2.png'
@@ -184,7 +184,7 @@ plot_and_combine(dir_out, fn, idx_to_label, edges,
 
 ### Convenience functions
 
-For convenience, the function `convert.convert_matrix(matrix)` is provided, which takes a matrix as input and returns two lists corresponding to edges and edge_weights.
+For convenience, the function `convert.convert_matrix(matrix)` is provided, which takes a matrix as input and returns two lists corresponding to `edges` and `edge_weights`.
 
 ```Python
 from nichord.convert import convert_matrix
