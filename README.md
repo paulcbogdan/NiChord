@@ -9,8 +9,12 @@
   <img src="example\outside_chord_example.png"  width="600" />
 </p>
 
+<p align="center">
+  <img src="example\ex1.png"  width="600" />
+</p>
+
 ## Installation
-`NiChord` (requires Python 3.5+) can be installed via pip:
+`NiChord` (requires Python 3.7+) can be installed via pip:
 
 ```
 $ pip install nichord
@@ -76,7 +80,7 @@ plot_chord(idx_to_label, edges, edge_weights=edge_weights, fp_chord=fp_chord,
 </p>
 
 
-Plotting the glass brain involves the same variables. Note that the colors of the glass brain nodes correspond to the network colors in the chord diagram.
+The code can also be used to plot glass brains, which leverages the same variables. Note that the colors of the glass brain nodes correspond to the network colors in the chord diagram.
 
 ```Python
 from nichord.glassbrain import plot_glassbrain
@@ -99,13 +103,13 @@ fp_combined = 'ex0_combined.png'
 combine_imgs(fp_glass, fp_chord, fp_combined)
 ```
 
-Notably, these functions have many other optional variables (e.g., passing specific colors for each network label using a dictionary). Further information on these can be seen by examining `example\example.py`, which contains code used to generate the two examples from the first section of this README. You can also learn about these by reading the hinting/documentation within each 
-function.
-
+Notably, these functions have many other optional variables (e.g., passing specific colors for each network label using a dictionary). 
 
 <p align="center">
   <img src="example\ex0.png" width="800"/>
 </p>
+
+Further information on these optional variables can be seen by examining `example\example.py`, which contains code used to generate the two examples from the first section of this README. You can also learn about these by reading the hinting/documentation within each function.
 
 ### Plotting everything at once
 
