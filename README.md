@@ -17,7 +17,11 @@
 `NiChord` (requires Python 3.7+) can be installed via pip:
 
 ```
-$ pip install nichord
+pip install nichord
+```
+
+```
+conda install -c conda-forge nichord
 ```
 
 ## Examples

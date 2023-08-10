@@ -1,9 +1,0 @@
-`NiChord` is a Python package for visualizing functional connectivity data. This package was inspired by [NeuroMArVL](https://immersive.erc.monash.edu/neuromarvl/?example=40496078-effa-4ac3-9d3e-cb7f946e7dd1_137.147.133.145), an online visualization tool.
-
-The code can function with any configuration of edges and labels specified by the user. 
-
-The glass brain diagrams (left & middle) rely on the plotting tools from [nilearn](https://nilearn.github.io/modules/generated/nilearn.plotting.plot_connectome.html), whereas the chord diagram (right) is made from scratch by drawing shapes in [matplotlib](https://matplotlib.org/). Most of the code, here, is dedicated to the chord diagrams. 
-
-This package additionally provides code to help assign labels to nodes based on their anatomical location.
-
-To find out more about the package and see an example, see its [GitHub repo](https://github.com/paulcbogdan/NiChord).
