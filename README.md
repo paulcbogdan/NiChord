@@ -14,11 +14,13 @@
 </p>
 
 ## Installation
-`NiChord` (requires Python 3.7+) can be installed via pip:
+Can be installed via pip:
 
 ```
 pip install nichord
 ```
+
+Can alternatively be installed via conda:
 
 ```
 conda install -c conda-forge nichord
