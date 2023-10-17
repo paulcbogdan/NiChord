@@ -122,12 +122,19 @@ Further information on these optional variables can be seen by examining `exampl
 You can also use `combine.plot_and_combine` to do `plot_chord`, `plot_glassbrain`, and `combine_image` with a single function. `plot_and_combine` will create (if needed) and use directories `chord` and `glass` wherever you specify the combined image to be made with `dir_out`.
 
 ```Python
+
+network_colors = {'Uncertain': 'black', 'Visual': 'purple',
+                  'SM': 'darkturquoise', 'DAN': 'green', 'VAN': 'fuchsia',
+                  'Limbic': 'burlywood', 'FPCN': 'orange', 'DMN': 'red'}
+
+network_order = ['FPCN', 'DMN', 'DAN', 'Visual', 'SM', 'Limbic', 
+                 'Uncertain', 'VAN']
+
 dir_out = 'example'
 fn = 'ex1.png'
 plot_and_combine(dir_out, fn, idx_to_label, edges,
                  edge_weights=edge_weights, coords=power_coords,
-                 network_order=network_order, network_colors=network_colors,
-                 )
+                 network_order=network_order, network_colors=network_colors)
 ```
 
 To `plot_and_combine`, you can pass `chord_kwargs` and/or `glass_kwargs` to adjust the appearance of the chord diagram or glass brain, which will in turn be sent to  `plot_chord` and/or `plot_glassbrain`. The example below shows this and also how you can add a title and give the chord diagram a black background:

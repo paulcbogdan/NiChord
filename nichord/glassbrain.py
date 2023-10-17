@@ -4,6 +4,8 @@ from nilearn import plotting
 import matplotlib
 from typing import Union
 
+from nichord.chord import _network_order_colors_check
+
 
 def plot_glassbrain(idx_to_label: dict,
                     edges: Union[list, np.ndarray],
@@ -47,13 +49,9 @@ def plot_glassbrain(idx_to_label: dict,
         will specify the order in which default matplotlib colors will be
         assigned to networks.
     """
-    if network_colors is None:
-        if network_order is None:
-            network_order = sorted(list(set(idx_to_label.values())))
-        default_colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-        network_colors = dict((network, color) for network, color in
-                              zip(network_order,
-                                  default_colors[:len(network_order)]))
+
+    network_order, network_colors = \
+        _network_order_colors_check(network_order, network_colors, idx_to_label)
 
     if isinstance(cmap, str):
         cmap = plt.get_cmap(cmap)

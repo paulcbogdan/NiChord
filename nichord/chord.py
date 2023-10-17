@@ -38,6 +38,35 @@ class ROI_to_degree:
         return self.idx_to_degree[idx]
 
 
+def _network_order_colors_check(network_order, network_colors, idx_to_label):
+    if network_order is None:
+        network_order = sorted(list(set(idx_to_label.values())))
+    else:
+        idx_labels = set(idx_to_label.values())
+        network_order = [network for network in network_order if
+                         network in idx_labels]
+        if idx_labels != set(network_order):
+            missing_labels = idx_labels - set(network_order)
+            raise ValueError('network_order, if specified, must contain all '
+                             f'idx_to_label labels. '
+                             f'Missing labels: {missing_labels}')
+
+    if network_colors is None:
+        default_colors = []
+        for i in range(1 + len(network_order) // 10):
+            default_colors += plt.rcParams['axes.prop_cycle'].by_key()['color']
+        network_colors = dict((network, color) for network, color in
+                              zip(network_order, default_colors[:len(network_order)]))
+    else:
+        idx_labels = set(idx_to_label.values())
+        if not idx_labels.issubset(set(network_colors.keys())):
+            missing_labels = set(idx_labels) - set(network_colors.keys())
+            raise ValueError('network_colors, if specified, must describe all '
+                             f'idx_to_label labels. '
+                             f'Missing labels: {missing_labels}')
+    return network_order, network_colors
+
+
 def plot_chord(idx_to_label: dict,
                edges: Union[list, np.ndarray],
                fp_chord: Union[str, None] = None,
@@ -105,14 +134,9 @@ def plot_chord(idx_to_label: dict,
         into matplotlib, the fix is being "monkeypatched". See
         chord.plot_rim_label(...) and patch_RenderAgg.py.
     """
-    if network_order is None:
-        network_order = sorted(list(set(idx_to_label.values())))
 
-    if network_colors is None:
-        default_colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-        network_colors = dict((network, color) for network, color in
-                              zip(network_order,
-                                  default_colors[:len(network_order)]))
+    network_order, network_colors = \
+        _network_order_colors_check(network_order, network_colors, idx_to_label)
 
     if edge_weights is None:
         edge_weights = [1] * len(edges)
@@ -170,7 +194,7 @@ def plot_chord(idx_to_label: dict,
                                           norm=matplotlib.colors.Normalize(
                                           vmin=vmin,
                                           vmax=vmax)),
-                                fraction=0.04, pad=0.02)
+                                fraction=0.04, pad=0.02, ax=plt.gca())
             cbar.ax.tick_params(labelsize=30)
 
     plt.axis('off')
@@ -629,6 +653,7 @@ def plot_arc(deg0: Union[int, float], deg1: [int, float],
     :param linewidth: Width of arcs
     """
 
+
     theta0 = radians(deg0)
     theta1 = radians(deg1)
     rim_center_theta0 = radians(rim_center_deg0)
@@ -637,6 +662,10 @@ def plot_arc(deg0: Union[int, float], deg1: [int, float],
     radius = radius - 0.02
     start_cart = polar_to_cart(radius, theta0)
     end_cart = polar_to_cart(radius, theta1)
+
+    if abs(deg0 - deg1) < .000001:
+        # Code goes here...
+        return
 
     theta0_ = (theta0 + np.pi) % (2 * np.pi) - np.pi
     theta1_ = (theta1 + np.pi) % (2 * np.pi) - np.pi

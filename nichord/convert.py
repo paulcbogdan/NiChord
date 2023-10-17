@@ -13,4 +13,7 @@ def convert_matrix(adj: Union[list, np.ndarray]) -> Tuple[np.ndarray, np.ndarray
     idxs = np.tril_indices(adj.shape[0], k=-1)
     weights = adj[idxs]
     idxs = np.array(idxs).T
+    smol = 1e-6
+    idxs = idxs[(weights > smol) | (weights < -smol)]
+    weights = weights[(weights > smol) | (weights < -smol)]
     return idxs, weights
