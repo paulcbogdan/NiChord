@@ -1,5 +1,4 @@
-![PyPI](https://img.shields.io/pypi/v/nichord) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nichord?link=https%3A%2F%2Fpypi.org%2Fproject%2Fnichord%2F)
-
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nichord?link=https%3A%2F%2Fpypi.org%2Fproject%2Fnichord%2F) ![PyPI](https://img.shields.io/pypi/v/nichord) [![Conda](https://anaconda.org/conda-forge/nichord/badges/version.svg)](https://anaconda.org/conda-forge/nichord)
 
 # NiChord
 
@@ -122,6 +121,7 @@ Further information on these optional variables can be seen by examining `exampl
 You can also use `combine.plot_and_combine` to do `plot_chord`, `plot_glassbrain`, and `combine_image` with a single function. `plot_and_combine` will create (if needed) and use directories `chord` and `glass` wherever you specify the combined image to be made with `dir_out`.
 
 ```Python
+from nichord.combine import plot_and_combine
 
 network_colors = {'Uncertain': 'black', 'Visual': 'purple',
                   'SM': 'darkturquoise', 'DAN': 'green', 'VAN': 'fuchsia',
@@ -221,4 +221,4 @@ The glass brain diagrams rely on the plotting tools from [`nilearn`](https://nil
 
 If you are using `NiChord` in your work, we ask that you please cite the paper below or the present reporsitory:
 
-Bogdan, P.C., Iordan, A. D., Shobrook, J., & Dolcos, F. (2023). ConnSearch: A Framework for Functional Connectivity Analysis Designed for Interpretability and Effectiveness at Limited Sample Sizes. *NeuroImage*, 120274.
+Bogdan, P.C., Iordan, A.D., Shobrook, J., & Dolcos, F. (2023). ConnSearch: A Framework for Functional Connectivity Analysis Designed for Interpretability and Effectiveness at Limited Sample Sizes. *NeuroImage*, 120274.
