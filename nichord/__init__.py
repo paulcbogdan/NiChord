@@ -16,4 +16,4 @@ from .coord_labeler import (get_idx_to_label,
 from .glassbrain import plot_glassbrain
 from .patch_RendererAgg import (NeuoChordRenderAgg,
                                 do_monkey_patch)
-from .combine import combine_imgs
+from .combine import combine_imgs, plot_and_combine

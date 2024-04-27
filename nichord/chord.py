@@ -3,6 +3,7 @@ import warnings
 
 import matplotlib
 from matplotlib import patches
+from nilearn._utils.param_validation import check_threshold
 from scipy import interpolate
 
 from collections import defaultdict
@@ -11,6 +12,9 @@ import numpy as np
 from math import radians
 from typing import Union, Tuple
 from collections import OrderedDict
+
+from scipy.stats import scoreatpercentile
+
 
 class ROI_to_degree:
     """
@@ -91,6 +95,7 @@ def plot_chord(idx_to_label: dict,
                plot_count: bool = False,
                plot_abs_sum: bool = False,
                norm_thickness: bool = False,
+               edge_threshold: Union[float, int, str] = 0.,
                dpi: int = 400) -> None:
     """
     Plots the chord diagram and either saves a file if fp_chord is not None or
@@ -133,6 +138,11 @@ def plot_chord(idx_to_label: dict,
         this, and a potential fix has been suggested. Until that is incorporated
         into matplotlib, the fix is being "monkeypatched". See
         chord.plot_rim_label(...) and patch_RenderAgg.py.
+    :param edge_threshold: This parameter acts the same as edge_threshold in
+        nilearn.plotting.plot_connectome. Edges whose abs(weight) is under
+        the threshold are omitted. edge_threshold can be a float or a string
+        representing a percentile (e.g., "25"). The latter causes edges below
+        the percentile to be omitted.
     """
 
     network_order, network_colors = \
@@ -140,11 +150,20 @@ def plot_chord(idx_to_label: dict,
 
     if edge_weights is None:
         edge_weights = [1] * len(edges)
+    else:
+        edge_weights, edges = _threshold_proc(edge_threshold, edge_weights,
+                                              edges)
+
 
     if vmin is None:
         vmin = min(edge_weights)
     if vmax is None:
         vmax = max(edge_weights)
+
+    if vmin == vmax:
+        raise ValueError(f'vmin and vmax cannot be equal. '
+                         f'Note: your inputs only provide {len(edges)} edges '
+                         f'after thresholding')
 
     if cmap is None:
         if abs(vmin - vmax) < 1e-6:
@@ -435,7 +454,7 @@ def plot_arcs(edges: list, idx_to_label: dict, network_low_high: dict,
               plot_abs_sum: bool = False,
               norm_thickness: bool = False,
               max_linewidth: Union[float, int] = 28,
-              sub_min_thickness: bool = False
+              sub_min_thickness: bool = False,
               ) -> (float, float):
     """
     Plots the arcs between each ROI. Within the rim/label, ROIs are positioned
@@ -777,3 +796,20 @@ def cart_to_polar(x: Union[float, int], y: Union[float, int]) -> Tuple[
     z = x + y * 1j
     r, theta = np.abs(z), np.angle(z)
     return r, theta
+
+
+def _threshold_proc(edge_threshold, edge_weights, edges):
+    if edge_threshold == 0: return edge_weights, edges
+    edge_threshold = check_threshold(
+        edge_threshold,
+        np.abs(edge_weights),
+        scoreatpercentile,
+        "edge_threshold",
+    )
+
+    if edge_threshold > 0:
+        edges = [edge for edge, weight in zip(edges, edge_weights)
+                 if abs(weight) > edge_threshold]
+        edge_weights = [weight for weight in edge_weights
+                        if abs(weight) > edge_threshold]
+    return edge_weights, edges

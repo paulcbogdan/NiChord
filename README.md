@@ -108,11 +108,7 @@ fp_combined = 'ex0_combined.png'
 combine_imgs(fp_glass, fp_chord, fp_combined)
 ```
 
-Notably, these functions have many other optional variables (e.g., passing specific colors for each network label using a dictionary). 
-
-<p align="center">
-  <img src="example\ex0.png" width="800"/>
-</p>
+Notably, these functions have many other optional variables. For example, `plot_chord`, `plot_glassbrain`, and `plot_and_combine` all take `edge_threshold` as an argument, which operates the same as in [nilearn](https://nilearn.github.io/dev/modules/generated/nilearn.plotting.plot_connectome.html). Also, you can pass specific colors for each network label using a dictionary.
 
 Further information on these optional variables can be seen by examining `example\example.py`, which contains code used to generate the two examples from the first section of this README. You can also learn about these by reading the hinting/documentation within each function.
 
@@ -217,8 +213,8 @@ applied when calling `chord.plot_chord_diagram(...)` with the default argument
 The glass brain diagrams rely on the plotting tools from [`nilearn`](https://nilearn.github.io/modules/generated/nilearn.plotting.plot_connectome.html), whereas the chord diagrams is made from scratch by drawing shapes in [`matplotlib`](https://matplotlib.org/).
 
 ## Authors
-`NiChord` was created by Paul C. Bogdan with help from [Jonathan Shobrook](https://github.com/shobrook) as part of our research in the [Dolcos Lab](https://dolcoslab.beckman.illinois.edu/) at the Beckman Institute for Advanced Science and Technology and the University of Illinois at  Urbana-Champaign. 
+`NiChord` was created by Paul C. Bogdan with help from [Jonathan Shobrook](https://github.com/shobrook) as part of our research in the [Dolcos Lab](https://dolcoslab.beckman.illinois.edu/) at the Beckman Institute for Advanced Science and Technology and the University of Illinois at Urbana-Champaign. 
 
-If you are using `NiChord` in your work, we ask that you please cite the paper below or the present reporsitory:
+If you are using `NiChord` in your work, it would be nice if you please cite the paper below or the present reporsitory:
 
 Bogdan, P.C., Iordan, A.D., Shobrook, J., & Dolcos, F. (2023). ConnSearch: A Framework for Functional Connectivity Analysis Designed for Interpretability and Effectiveness at Limited Sample Sizes. *NeuroImage*, 120274.

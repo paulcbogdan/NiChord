@@ -9,16 +9,15 @@ if sys.version_info[:3] < (3, 7, 0):
     sys.exit(1)
 
 desc = '`NiChord` is a Python package for visualizing functional connectivity data. To find out more about the ' \
-       'package and see a package, take a look at its [GitHub repo](https://github.com/paulcbogdan/NiChord)'
-
-'To find out more about the package and see an example, see its .'
+       'package and see a package, take a look at its [GitHub repo](https://github.com/paulcbogdan/NiChord). ' \
+       'The package is also available via [conda](https://anaconda.org/conda-forge/nichord).'
 
 setup(
     name="nichord",
     description="Creates chord diagrams for connectivity/graph data",
     long_description=desc,
     long_description_content_type="text/markdown",
-    version="v0.2.7",
+    version="v0.3.0",
     packages=["nichord"],
     python_requires=">=3.7",
     url="https://github.com/paulcbogdan/NiChord",

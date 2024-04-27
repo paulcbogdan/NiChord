@@ -77,7 +77,8 @@ def plot_and_combine(dir_out: str,
                      glass_kwargs: Union[None, dict] = None,
                      title: Union[None, str] = None,
                      only1glass: bool = False,
-                     fontsize: int = 82
+                     fontsize: int = 82,
+                     edge_threshold: Union[float, int, str] = 0.,
                      ) -> None:
     name, file_ext = os.path.splitext(fn)
     if file_ext == '':
@@ -93,24 +94,18 @@ def plot_and_combine(dir_out: str,
     fp_combined = os.path.join(dir_out, f'{name}{file_ext}')
 
     if chord_kwargs is None: chord_kwargs = {}
-    if 'network_order' not in chord_kwargs:
-        chord_kwargs['network_order'] = network_order
-    if 'network_colors' not in chord_kwargs:
-        chord_kwargs['network_colors'] = network_colors
-    if 'cmap' not in chord_kwargs:
-        chord_kwargs['cmap'] = cmap
+    if glass_kwargs is None: glass_kwargs = {}
+    keys = ['network_order', 'network_colors', 'cmap', 'edge_threshold']
+    vals = [network_order, network_colors, cmap, edge_threshold]
+    for key, val in zip(keys, vals):
+        if key not in chord_kwargs:
+            chord_kwargs[key] = val
+        if key not in glass_kwargs:
+            glass_kwargs[key] = val
 
     plot_chord(idx_to_label, edges, edge_weights=edge_weights,
                coords=coords, fp_chord=fp_chord,
                **chord_kwargs)
-
-    if glass_kwargs is None: glass_kwargs = {}
-    if 'network_order' not in glass_kwargs:
-        glass_kwargs['network_order'] = network_order
-    if 'network_colors' not in glass_kwargs:
-        glass_kwargs['network_colors'] = network_colors
-    if 'cmap' not in glass_kwargs:
-        glass_kwargs['cmap'] = cmap
 
     plot_glassbrain(idx_to_label, edges, edge_weights, fp_glass,
                     coords, **glass_kwargs)

@@ -4,7 +4,7 @@ from nilearn import plotting
 import matplotlib
 from typing import Union
 
-from nichord.chord import _network_order_colors_check
+from nichord.chord import _network_order_colors_check, _threshold_proc
 
 
 def plot_glassbrain(idx_to_label: dict,
@@ -20,7 +20,9 @@ def plot_glassbrain(idx_to_label: dict,
                     network_colors: Union[None, dict] = None,
                     dpi: int = 400,
                     vmin: Union[None, int, float] = None,
-                    vmax: Union[None, int, float] = None) -> None:
+                    vmax: Union[None, int, float] = None,
+                    edge_threshold: Union[float, int, str] = 0.,
+                    ) -> None:
     """
     Plots the connectome on a brain, where the node colors correspond to the
         ROI's label (specified by idx_to_label). Each edge's color correspond
@@ -48,6 +50,11 @@ def plot_glassbrain(idx_to_label: dict,
     :param network_order: If network_colors is None, then this list
         will specify the order in which default matplotlib colors will be
         assigned to networks.
+    :param edge_threshold: This parameter acts the same as edge_threshold in
+        nilearn.plotting.plot_connectome. Edges whose abs(weight) is under
+        the threshold are omitted. edge_threshold can be a float or a string
+        representing a percentile (e.g., "25"). The latter causes edges below
+        the percentile to be omitted.
     """
 
     network_order, network_colors = \
@@ -58,6 +65,9 @@ def plot_glassbrain(idx_to_label: dict,
 
     if edge_weights is None:
         edge_weights = [1] * len(edges)
+    else:
+        edge_weights, edges = _threshold_proc(edge_threshold, edge_weights,
+                                              edges)
 
     nonzero_node_idxs = list(set(node_idx for tup in edges for node_idx in tup))
     n = len(nonzero_node_idxs)
