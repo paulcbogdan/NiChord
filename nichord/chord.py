@@ -211,9 +211,8 @@ def plot_chord(idx_to_label: dict,
             cbar = plt.colorbar(
                 mappable=matplotlib.cm.ScalarMappable(cmap=cmap,
                                           norm=matplotlib.colors.Normalize(
-                                          vmin=vmin,
-                                          vmax=vmax)),
-                                fraction=0.04, pad=0.02, ax=plt.gca())
+                                          vmin=vmin, vmax=vmax)),
+                                fraction=0.04, pad=0.04, ax=plt.gca())
             cbar.ax.tick_params(labelsize=30)
 
     plt.axis('off')
@@ -260,18 +259,25 @@ def plot_rim_and_labels(idx_to_label: dict, network_order: list,
         cnt = network_counts[network]
         degree_st = circle_consumed / num_ROIs * 360
         degree_end = (circle_consumed + cnt) / num_ROIs * 360
-        plot_rim(degree_st, degree_end, rim_border=rim_border, radius=radius,
+        if degree_end - degree_st < rim_border:
+            warnings.warn(f'There are very few ROIs for the {network} network. '
+                          f'May produce weirdness')
+            rim_border_ = 0
+        else:
+            rim_border_ = rim_border
+        plot_rim(degree_st, degree_end, rim_border=rim_border_, radius=radius,
                  color=network_colors[network])
-        plot_rim_label(degree_st, degree_end, network, rim_border=rim_border,
+        plot_rim_label(degree_st, degree_end, network, rim_border=rim_border_,
                        radius=radius,
                        color=network_colors[network],
                        label_fontsize=label_fontsize,
                        do_monkeypatch=do_monkeypatch)
         network_low_high[network] = (
-            degree_st + rim_border, degree_end - rim_border)
+            degree_st + rim_border_, degree_end - rim_border_)
         network_center[network] = (circle_consumed + cnt * 0.5) / num_ROIs * 360
         network_starts_ends[network] = (degree_st, degree_end)
         circle_consumed += cnt
+
     if black_BG:
         ax = plt.gca()
         black_circle = plt.Circle((0, 0), radius=radius - .0225, color='k')
