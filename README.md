@@ -215,6 +215,6 @@ The glass brain diagrams rely on the plotting tools from [`nilearn`](https://nil
 ## Authors
 `NiChord` was created by Paul C. Bogdan with help from [Jonathan Shobrook](https://github.com/shobrook) as part of our research in the [Dolcos Lab](https://dolcoslab.beckman.illinois.edu/) at the Beckman Institute for Advanced Science and Technology and the University of Illinois at Urbana-Champaign. 
 
-If you are using `NiChord` in your work, it would be nice if you please cite the paper below or the present reporsitory:
+If you are using `NiChord` in your work, it would be nice if you could please cite the paper below (or at least link to the present repository):
 
 Bogdan, P.C., Iordan, A.D., Shobrook, J., & Dolcos, F. (2023). ConnSearch: A Framework for Functional Connectivity Analysis Designed for Interpretability and Effectiveness at Limited Sample Sizes. *NeuroImage*, 120274.
