@@ -17,7 +17,7 @@ setup(
     description="Creates chord diagrams for connectivity/graph data",
     long_description=desc,
     long_description_content_type="text/markdown",
-    version="v0.3.1",
+    version="v0.3.2",
     packages=["nichord"],
     python_requires=">=3.7",
     url="https://github.com/paulcbogdan/NiChord",
@@ -37,6 +37,8 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
     ],
     license="MIT",
     license_file="LICENSE.txt"
